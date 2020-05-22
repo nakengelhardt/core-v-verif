@@ -31,12 +31,12 @@ echo "mutated.sv" >> mutated_manifest.flist
 MAKEFLAGS="CV32E40P_MANIFEST=mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR"
 MAKEFILE=../../Makefile
 make -f $MAKEFILE $MAKEFLAGS testbench_verilator
+ln -s ../../div_only_firmware.hex
+ln -s ../../firmware.hex
 
 # for each mutation (listed in input.txt)
 while read idx mut; do
 	# shorter firmware first
-	make -f $MAKEFILE $MAKEFLAGS $TEST_DIR/div_only_firmware/div_only_firmware.hex
-	cp $TEST_DIR/div_only_firmware/div_only_firmware.hex div_only_firmware.hex
 	if ! timeout 1m ./testbench_verilator +firmware=div_only_firmware.hex --mutidx ${idx} > sim_short_${idx}.out || ! grep "PASSED" sim_short_${idx}.out
 	then
 		echo "${idx} FAIL" >> output.txt
@@ -44,8 +44,6 @@ while read idx mut; do
 	fi
 
 	# longer firmware if short doesn't catch anything
-	make -f $MAKEFILE $MAKEFLAGS $TEST_DIR/firmware/firmware.hex
-	cp $TEST_DIR/firmware/firmware.hex firmware.hex
 	timeout 1m ./testbench_verilator +firmware=firmware.hex --mutidx ${idx} > sim_long_${idx}.out || true
 
 	if [[ `grep -c "ERROR" sim_long_${idx}.out` -ne 2 ]]

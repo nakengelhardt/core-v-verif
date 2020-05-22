@@ -27,3 +27,4 @@ div-only-veri-run: verilate $(DIV_ONLY_FIRMWARE)/div_only_firmware.hex
 	./testbench_verilator $(VERI_FLAGS) \
 		"+firmware=$(DIV_ONLY_FIRMWARE)/div_only_firmware.hex" \
 		| tee $(VERI_LOG_DIR)/div-only-veri-run.log
+

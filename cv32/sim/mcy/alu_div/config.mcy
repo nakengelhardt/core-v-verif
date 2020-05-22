@@ -1,6 +1,10 @@
 [options]
-size 100
-tags COVERED UNCOVERED NOCHANGE PROBE FMGAP
+size 1000
+tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
+
+[setup]
+bash setup_sim.sh
+bash setup_dsim.sh
 
 [script]
 verific -work fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
@@ -19,6 +23,15 @@ pmuxtree
 [logic]
 if result("test_sim") == "FAIL":
   tag("COVERED")
+  tag("VERI")
+  if rng(100) < 20:
+    tag("PROBE")
+    if result("test_eq") == "PASS":
+      tag("FMGAP")
+  return
+elif result("test_dsim") == "FAIL":
+  tag("COVERED")
+  tag("UVM")
   if rng(100) < 20:
     tag("PROBE")
     if result("test_eq") == "PASS":
@@ -41,6 +54,10 @@ if tags("COVERED")+tags("UNCOVERED"):
 maxbatchsize 10
 expect PASS FAIL
 run bash $PRJDIR/test_sim.sh
+
+[test test_dsim]
+expect PASS FAIL
+run bash $PRJDIR/test_dsim.sh
 
 [test test_eq]
 expect PASS FAIL

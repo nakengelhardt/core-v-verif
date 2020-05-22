@@ -110,7 +110,7 @@ RTLSRC_INCDIR := $(RTLSRC_HOME)/include
 # Common Makefile:
 #    - Core Firmware and the RISCV GCC Toolchain (SDK)
 #    - Variables for RTL dependencies
-include ../Common.mk
+include $(PROJ_ROOT_DIR)/cv32/sim/Common.mk
 
 
 ###############################################################################
@@ -133,7 +133,7 @@ $(CV32E40P_PKG):
 #include unsim.mk
 #else
 ifeq ($(SIMULATOR), dsim)
-include dsim.mk
+include $(PROJ_ROOT_DIR)/cv32/sim/uvmt_cv32/dsim.mk
 else
 ifeq ($(SIMULATOR), xrun)
 include xrun.mk
@@ -163,10 +163,10 @@ clean_core_tests:
 	find $(CORE_TEST_DIR) -name *.map -exec rm {} \;
 
 clean_test_programs:
-	find ../../tests/uvmt_cv32/test-programs -name *.o   -exec rm {} \;
-	find ../../tests/uvmt_cv32/test-programs -name *.hex -exec rm {} \;
-	find ../../tests/uvmt_cv32/test-programs -name *.elf -exec rm {} \;
-	find ../../tests/uvmt_cv32/test-programs -name *.map -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.o   -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.hex -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.elf -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.map -exec rm {} \;
 
 clean_riscvdv:
 	rm -rf $(RISCVDV_PKG)
