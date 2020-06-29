@@ -40,10 +40,11 @@
  */
 module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
                             // https://github.com/openhwgroup/core-v-docs/blob/master/cores/cv32e40p/CV32E40P_and%20CV32E40_Features_Parameters.pdf
-                            parameter PULP_CLUSTER        =   0, //changed
-                                      FPU                 =   0,
-                                      PULP_ZFINX          =   0,
-                                      DM_HALTADDRESS      =  32'h1A110800,
+                            parameter PULP_HWLP           =  0,
+                                      PULP_CLUSTER        =  0,
+                                      FPU                 =  0,
+                                      PULP_ZFINX          =  0,
+                                      NUM_MHPMCOUNTERS    =  1,
                             // Remaining parameters are used by TB components only
                                       INSTR_ADDR_WIDTH    =  32,
                                       INSTR_RDATA_WIDTH   =  32,
@@ -76,14 +77,23 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
     logic [31:0]                  data_rdata;
     logic [31:0]                  data_wdata;
 
-    logic [ 4:0]                  irq_id_out;
     logic [ 4:0]                  irq_id_in;
+
+    logic [63:0]                  irq64;
+    logic                         irq_ack;
+    logic [ 5:0]                  irq_id6;
+
+    logic                         debug_req;
+   
+    // Hold interrupts idle for now
+    assign irq64 = {64{1'b0}};
 
     // Load the Instruction Memory 
     initial begin: load_instruction_memory
       string firmware;
       int    fd;
-
+       int   fill_cnt;
+       bit [7:0] rnd_byte;
       `uvm_info("DUT_WRAP", "waiting for load_instr_mem to be asserted.", UVM_DEBUG)
       wait(core_cntrl_if.load_instr_mem !== 1'bX);
       if(core_cntrl_if.load_instr_mem === 1'b1) begin
@@ -99,6 +109,19 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
           // Now load it...
           `uvm_info("DUT_WRAP", $sformatf("loading firmware %0s", firmware), UVM_NONE)
           $readmemh(firmware, uvmt_cv32_tb.dut_wrap.ram_i.dp_ram_i.mem);
+          `ifdef ISS
+             // If using ISS for any location in RTL mem = X fill RTL and ISS memory with same random value
+             fill_cnt = 0;
+             for (int index=0; index < 2**RAM_ADDR_WIDTH; index++) begin
+                if (uvmt_cv32_tb.dut_wrap.ram_i.dp_ram_i.mem[index] === 8'hXX) begin
+                    fill_cnt++;
+                   rnd_byte = $random();
+                   uvmt_cv32_tb.dut_wrap.ram_i.dp_ram_i.mem[index]=rnd_byte;
+                   uvmt_cv32_tb.iss_wrap.ram.mem[index/4][((((index%4)+1)*8)-1)-:8]=rnd_byte; // convert byte to 32-bit addressing
+                end
+             end
+             `uvm_info("DUT_WRAP", $sformatf("Filled 0d%0d RTL and ISS memory bytes with random values", fill_cnt), UVM_HIGH)
+          `endif
         end
         else begin
           `uvm_error("DUT_WRAP", "No firmware specified!")
@@ -109,12 +132,44 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
       end
     end
 
+    // --------------------------------------------
+    // Load the Debugger Code
+    initial begin: load_debugger_code
+      string debugger_code;
+      int    dbg_fd;
+
+      // Load the pre-compiled debugger code
+      if($value$plusargs("debugger=%s", debugger_code)) begin
+        // First, check if it exists...
+        dbg_fd = $fopen (debugger_code, "r");
+        if (dbg_fd)  `uvm_info ("DUT_WRAP", $sformatf("%s was opened successfully : (dbg_fd=%0d)", debugger_code, dbg_fd), UVM_DEBUG)
+        else     `uvm_fatal("DUT_WRAP", $sformatf("%s was NOT opened successfully : (dbg_fd=%0d)", debugger_code, dbg_fd))
+        $fclose(dbg_fd);
+        // Now load it...
+        `uvm_info("DUT_WRAP", $sformatf("loading debugger %0s", debugger_code), UVM_NONE)
+        //$readmemh(debugger_code, uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem);
+      end
+      else begin
+        `uvm_info("DUT_WRAP", "No debugger code specified. Populate debugger ram with 'dret' instruction", UVM_NONE)
+        // debugger return instruction (dret) =  0x7b200073
+        //uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem[0] = 8'h73;
+        //uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem[1] = 8'h00;
+        //uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem[2] = 8'h20;
+        //uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem[3] = 8'h7b;
+        // pad with something to prevent X's being read during prefetch
+        //for(int i=4; i<32; i++)
+        //  uvmt_cv32_tb.dut_wrap.ram_i.dbg_dp_ram_i.mem[i] = 8'h00;
+      end
+    end // block: load_debugger_code
+
+    // --------------------------------------------
     // instantiate the core
-    riscv_core #(
-                 .PULP_CLUSTER    (PULP_CLUSTER),
-                 .FPU             (FPU),
-                 .PULP_ZFINX      (PULP_ZFINX),
-                 .DM_HALTADDRESS  (DM_HALTADDRESS)
+    cv32e40p_core #(
+                 .PULP_HWLP        (PULP_HWLP),
+                 .PULP_CLUSTER     (PULP_CLUSTER),
+                 .FPU              (FPU),
+                 .PULP_ZFINX       (PULP_ZFINX),
+                 .NUM_MHPMCOUNTERS (NUM_MHPMCOUNTERS)
                 )
     riscv_core_i
         (
@@ -122,13 +177,11 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
          .rst_ni                 ( clknrst_if.reset_n             ),
 
          .clock_en_i             ( core_cntrl_if.clock_en         ),
-         .test_en_i              ( core_cntrl_if.test_en          ),
-
-         .fregfile_disable_i     ( core_cntrl_if.fregfile_disable ),
+         .scan_cg_en_i           ( core_cntrl_if.scan_cg_en       ),
 
          .boot_addr_i            ( core_cntrl_if.boot_addr        ),
-         .core_id_i              ( core_cntrl_if.core_id          ),
-         .cluster_id_i           ( core_cntrl_if.cluster_id       ),
+         .dm_halt_addr_i         ( core_cntrl_if.dm_halt_addr     ),
+         .hart_id_i              ( core_cntrl_if.hart_id          ),
 
          .instr_req_o            ( instr_req                      ),
          .instr_gnt_i            ( instr_gnt                      ),
@@ -159,19 +212,19 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
          // TODO: interrupts significantly updated for CV32E40P
          //       Connect all interrupt signals to an SV interface
          //       and pass to ENV for an INTERRUPT AGENT to drive/monitor.
-         //.irq_i                  ( irq                            ),
+         .irq_i                  ( irq64                            ),
+         .irq_ack_o              ( irq_ack                          ),
+         .irq_id_o               ( irq_id6                          ),
          //.irq_id_i               ( irq_id_in                      ),
          //.irq_sec_i              ( (core_interrupts_if.irq_sec||irq) ),
-         .irq_ack_o              ( irq_ack                           ),
-         .irq_id_o               ( irq_id_out                        ),
-         .irq_software_i         ( core_interrupts_if.irq_software   ),
-         .irq_timer_i            ( core_interrupts_if.irq_timer      ),
-         .irq_external_i         ( core_interrupts_if.irq_external   ),
-         .irq_fast_i             ( core_interrupts_if.irq_fast       ),
-         .irq_nmi_i              ( core_interrupts_if.irq_nmi        ),
-         .irq_fastx_i            ( core_interrupts_if.irq_fastx      ),
+         //.irq_software_i         ( core_interrupts_if.irq_software   ),
+         //.irq_timer_i            ( core_interrupts_if.irq_timer      ),
+         //.irq_external_i         ( core_interrupts_if.irq_external   ),
+         //.irq_fast_i             ( core_interrupts_if.irq_fast       ),
+         //.irq_nmi_i              ( core_interrupts_if.irq_nmi        ),
+         //.irq_fastx_i            ( core_interrupts_if.irq_fastx      ),
 
-         .debug_req_i            ( core_cntrl_if.debug_req           ),
+         .debug_req_i            ( debug_req                         ),
 
          .fetch_enable_i         ( core_cntrl_if.fetch_en            ),
          .core_busy_o            ( core_status_if.core_busy          )
@@ -186,7 +239,7 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
          .rst_ni         ( clknrst_if.reset_n             ),
 
          .instr_req_i    ( instr_req                      ),
-         .instr_addr_i   ( instr_addr[RAM_ADDR_WIDTH-1:0] ),
+         .instr_addr_i   ( instr_addr                     ),
          .instr_rdata_o  ( instr_rdata                    ),
          .instr_rvalid_o ( instr_rvalid                   ),
          .instr_gnt_o    ( instr_gnt                      ),
@@ -200,10 +253,12 @@ module uvmt_cv32_dut_wrap #(// DUT (riscv_core) parameters.
          .data_rvalid_o  ( data_rvalid                    ),
          .data_gnt_o     ( data_gnt                       ),
 
-         .irq_id_i       ( irq_id_out                     ),
+         .irq_id_i       ( 5'b00000                       ),
          .irq_ack_i      ( irq_ack                        ),
          .irq_id_o       ( irq_id_in                      ),
          .irq_o          ( irq                            ),
+
+         .debug_req_o    ( debug_req                      ),
 
          .pc_core_id_i   ( riscv_core_i.pc_id             ),
 

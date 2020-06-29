@@ -12,13 +12,18 @@
 // Contributor: Robert Balas <balasr@student.ethz.ch>
 
 module riscv_wrapper
-    #(parameter INSTR_RDATA_WIDTH = 32,
+    #(parameter // Parameters used by TB
+                INSTR_RDATA_WIDTH = 32,
                 RAM_ADDR_WIDTH    = 20,
                 BOOT_ADDR         = 'h80,
+                DM_HALTADDRESS    = 32'h1A11_0800,
+                HART_ID           = 32'h0000_0000,
+                // Parameters used by DUT
+                PULP_HWLP         = 0,
                 PULP_CLUSTER      = 0,
                 FPU               = 0,
                 PULP_ZFINX        = 0,
-                DM_HALTADDRESS    = 32'h1A110800
+                NUM_MHPMCOUNTERS  = 1
     )
     (input logic         clk_i,
      input logic         rst_ni,
@@ -46,27 +51,26 @@ module riscv_wrapper
     logic [31:0]                  data_wdata;
 
     // signals to debug unit
-    logic                         debug_req_i;
+    logic                         debug_req;
 
     // irq signals (not used)
     logic                         irq;
     logic [0:4]                   irq_id_in;
     logic                         irq_ack;
-    logic [0:4]                   irq_id_out;
+    logic [0:5]                   irq_id_out;
     logic                         irq_sec;
 
 
     // interrupts (only timer for now)
     assign irq_sec     = '0;
 
-    assign debug_req_i = 1'b0;
-
     // instantiate the core
-    riscv_core #(
-                 .PULP_CLUSTER    (PULP_CLUSTER),
-                 .FPU             (FPU),
-                 .PULP_ZFINX      (PULP_ZFINX),
-                 .DM_HALTADDRESS  (DM_HALTADDRESS)
+    cv32e40p_core #(
+                 .PULP_HWLP        (PULP_HWLP),
+                 .PULP_CLUSTER     (PULP_CLUSTER),
+                 .FPU              (FPU),
+                 .PULP_ZFINX       (PULP_ZFINX),
+                 .NUM_MHPMCOUNTERS (NUM_MHPMCOUNTERS)
                 )
     riscv_core_i
         (
@@ -74,13 +78,11 @@ module riscv_wrapper
          .rst_ni                 ( rst_ni                ),
 
          .clock_en_i             ( '1                    ),
-         .test_en_i              ( '0                    ),
-
-         .fregfile_disable_i     ( '0                    ),
+         .scan_cg_en_i           ( '0                    ),
 
          .boot_addr_i            ( BOOT_ADDR             ),
-         .core_id_i              ( 4'h0                  ),
-         .cluster_id_i           ( 6'h0                  ),
+         .dm_halt_addr_i         ( DM_HALTADDRESS        ),
+         .hart_id_i              ( HART_ID               ),
 
          .instr_req_o            ( instr_req             ),
          .instr_gnt_i            ( instr_gnt             ),
@@ -108,16 +110,18 @@ module riscv_wrapper
          .apu_master_result_i    (                       ),
          .apu_master_flags_i     (                       ),
 
+         // TODO: Interrupts need to be re-done
+         .irq_i                  ( {64{1'b0}}            ),
          .irq_ack_o              ( irq_ack               ),
          .irq_id_o               ( irq_id_out            ),
-         .irq_software_i         (1'b0                   ),
-         .irq_timer_i            (1'b0                   ),
-         .irq_external_i         (1'b0                   ),
-         .irq_fast_i             ({15{1'b0}}             ),
-         .irq_nmi_i              (1'b0                   ),
-         .irq_fastx_i            ({32{1'b0}}             ),
+         //.irq_software_i         (1'b0                   ),
+         //.irq_timer_i            (1'b0                   ),
+         //.irq_external_i         (1'b0                   ),
+         //.irq_fast_i             ({15{1'b0}}             ),
+         //.irq_nmi_i              (1'b0                   ),
+         //.irq_fastx_i            ({32{1'b0}}             ),
 
-         .debug_req_i            ( debug_req_i           ),
+         .debug_req_i            ( debug_req             ),
 
          .fetch_enable_i         ( fetch_enable_i        ),
          .core_busy_o            ( core_busy_o           )
@@ -146,10 +150,13 @@ module riscv_wrapper
          .data_rvalid_o  ( data_rvalid                    ),
          .data_gnt_o     ( data_gnt                       ),
 
-         .irq_id_i       ( irq_id_out                     ),
+         // TODO: Interrupts need to be re-done
+         .irq_id_i       ( irq_id_out[0:4]                ),
          .irq_ack_i      ( irq_ack                        ),
          .irq_id_o       ( irq_id_in                      ),
          .irq_o          ( irq                            ),
+
+         .debug_req_o    ( debug_req                      ),
 
          .pc_core_id_i   ( riscv_core_i.pc_id             ),
 
