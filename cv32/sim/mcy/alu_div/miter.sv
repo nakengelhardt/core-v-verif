@@ -31,7 +31,7 @@ logic uut_valid_out;
 logic [31:0] ref_result_div;
 logic [31:0] uut_result_div;
 
-  riscv_alu_div ref (
+  cv32e40p_alu_div ref (
 		.mutsel    (1'b 0),
     .Clk_CI    (clk),
     .Rst_RBI   (rst_n),
@@ -53,7 +53,7 @@ logic [31:0] uut_result_div;
     .OutVld_SO    (ref_valid_out)
 	);
 
-	riscv_alu_div uut (
+	cv32e40p_alu_div uut (
 		.mutsel    (1'b 1),
     .Clk_CI    (clk),
     .Rst_RBI   (rst_n),
