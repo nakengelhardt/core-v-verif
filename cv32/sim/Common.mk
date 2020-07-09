@@ -54,7 +54,9 @@
 # Head of the master branch as of 2020-05-29
 CV32E40P_REPO   ?= https://github.com/openhwgroup/cv32e40p
 CV32E40P_BRANCH ?= master
-CV32E40P_HASH   ?= 8e22c994198ad08f4cacf239d56d98e1cc25627b
+#CV32E40P_HASH   ?= 8e22c994198ad08f4cacf239d56d98e1cc25627b
+#2020-07-07
+CV32E40P_HASH   ?= 8a3345cd80db4097cd007697233e54f020245bfb
 
 FPNEW_REPO      ?= https://github.com/pulp-platform/fpnew
 FPNEW_BRANCH    ?= master
@@ -64,8 +66,13 @@ FPNEW_HASH      ?= f108dfdd84f7c24dcdefb35790fafb3905bce552
 #FPNEW_HASH      ?= babffe88fcf6d2931a7afa8d121b6a6ba4f532f7
 
 RISCVDV_REPO    ?= https://github.com/google/riscv-dv
+#RISCVDV_REPO    ?= https://github.com/MikeOpenHWGroup/riscv-dv
 RISCVDV_BRANCH  ?= master
-RISCVDV_HASH    ?= head
+# May 2 version of riscv-dv.  Later versions have had known randomization errors
+#RISCVDV_HASH    ?= c37c5f3f57ac61991aa5abd614badb367c5d025d
+# July 8 version.  Randomization errors have significantly improved.
+#                  Generation of riscv_pmp_test fails (we do not care for CV32E40P).
+RISCVDV_HASH    ?= 10fd4fa8b7d0808732ecf656c213866cae37045a
 
 # Generate command to clone the CV32E40P RTL
 ifeq ($(CV32E40P_BRANCH), master)
@@ -177,7 +184,7 @@ COMPLIANCE_TEST_OBJS     = $(addsuffix .o, \
 
 # Thales verilator testbench compilation start
 
-SUPPORTED_COMMANDS := vsim-firmware-unit-test questa-unit-test questa-unit-test-gui dsim-unit-test 
+SUPPORTED_COMMANDS := vsim-firmware-unit-test questa-unit-test questa-unit-test-gui dsim-unit-test vcs-unit-test
 SUPPORTS_MAKE_ARGS := $(findstring $(firstword $(MAKECMDGOALS)), $(SUPPORTED_COMMANDS))
 
 ifneq "$(SUPPORTS_MAKE_ARGS)" ""
@@ -201,9 +208,16 @@ FIRMWARE_UNIT_TEST_OBJS   =  	$(addsuffix .o, \
 # must be able to run (and pass!) prior to generating a pull-request.
 sanity: hello-world
 
-# rules to generate hex (loadable by simulators) from elf
+###############################################################################
+# Rule to generate hex (loadable by simulators) from elf
+# Relocate debugger to last 16KB of mm_ram
+#    $@ is the file being generated.
+#    $< is first prerequiste.
+#    $^ is all prerequistes.
+#    $* is file_name (w/o extension) of target
 %.hex: %.elf
-	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@
+	$(RISCV_EXE_PREFIX)objcopy -O verilog $< $@ \
+		--change-section-address  .debugger=0x3FC000
 	$(RISCV_EXE_PREFIX)readelf -a $< > $*.readelf
 	$(RISCV_EXE_PREFIX)objdump -D $*.elf > $*.objdump
 
@@ -213,98 +227,36 @@ bsp:
 clean-bsp:
 	make clean -C $(BSP)
 
-# Running custom programs:
-# We link with our custom crt0.s and syscalls.c against newlib so that we can
-# use the c standard library
-#$(CUSTOM_DIR)/$(CUSTOM_PROG).elf: $(CUSTOM_DIR)/$(CUSTOM_PROG).c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM_DIR)/link.ld  \
-#		-static \
-#		$(CUSTOM_DIR)/crt0.S \
-#		$^ $(CUSTOM_DIR)/syscalls.c $(CUSTOM_DIR)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
+##############################################################################
+# Special debug_test build
+# keep raw elf files to generate helpful debugging files such as dissambler
+.PRECIOUS : %debug_test.elf
 
-# Similaro to CUSTOM (above), this time with ASM directory
-#$(ASM)/$(ASM_PROG).elf: $(ASM)/$(ASM_PROG).S
-#		@   echo "Compiling $(ASM_PROG).S"
-#		$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -c -o $(ASM)/$(ASM_PROG).o \
-#		$(ASM)/$(ASM_PROG).S -DRISCV32GC -O0 -nostdlib -nostartfiles \
-#		-I $(ASM)
-#		@   echo "Linking $(ASM_PROG).o"
-#		$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc \
-#		-o $(ASM)/$(ASM_PROG).elf \
-#		$(ASM)/$(ASM_PROG).o -nostdlib -nostartfiles \
-#		-T $(ASM)/link.ld
+# Prepare file list for .elf
+# Get the source file names from the BSP directory
+PREREQ_BSP_FILES  = $(filter %.c %.S %.ld,$(wildcard $(BSP)/*))
+BSP_SOURCE_FILES  = $(notdir $(filter %.c %.S ,$(PREREQ_BSP_FILES)))
 
-# HELLO WORLD: custom/hello_world.elf: ../../tests/core/custom/hello_world.c
+# Let the user override BSP files
+# The following will build a list of BSP files that are not in test directory
+BSP_FILES = $(foreach BSP_FILE, $(BSP_SOURCE_FILES), \
+	       $(if $(wildcard  $(addprefix $(dir $*), $(BSP_FILE))),,\
+	          $(wildcard $(addprefix $(BSP)/, $(BSP_FILE))) ) \
+	     )
 
-#$(CUSTOM)/hello_world.elf: $(CUSTOM)/hello_world.c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM)/link.ld  \
-#		-static \
-#		$(CUSTOM)/crt0.S \
-#		$^ $(CUSTOM)/syscalls.c $(CUSTOM)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
+# Get Test Files
+#  Note, the prerequisite uses '%', while the recipe uses '$*'
+PREREQ_TEST_FILES = $(filter %.c %.S,$(wildcard $(dir %)*))
+TEST_FILES        = $(filter %.c %.S,$(wildcard $(dir $*)*))
 
-#$(CUSTOM)/misalign.elf: $(CUSTOM)/misalign.c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM)/link.ld  \
-#		-static \
-#		$(CUSTOM)/crt0.S \
-#		$^ $(CUSTOM)/syscalls.c $(CUSTOM)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
-
-#$(CUSTOM)/illegal.elf: $(CUSTOM)/illegal.c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM)/link.ld  \
-#		-static \
-#		$(CUSTOM)/crt0.S \
-#		$^ $(CUSTOM)/syscalls.c $(CUSTOM)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
-
-#$(CUSTOM)/fibonacci.elf: $(CUSTOM)/fibonacci.c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM)/link.ld  \
-#		-static \
-#		$(CUSTOM)/crt0.S \
-#		$^ $(CUSTOM)/syscalls.c $(CUSTOM)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
-
-#$(CUSTOM)/dhrystone.elf: $(CUSTOM)/dhrystone.c
-#	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ -w -Os -g -nostdlib \
-#		-T $(CUSTOM)/link.ld  \
-#		-static \
-#		$(CUSTOM)/crt0.S \
-#		$^ $(CUSTOM)/syscalls.c $(CUSTOM)/vectors.S \
-#		-I $(RISCV)/riscv32-unknown-elf/include \
-#		-L $(RISCV)/riscv32-unknown-elf/lib \
-#		-lc -lm -lgcc
-
-#$(CUSTOM)/riscv_ebreak_test_0.elf: $(CUSTOM)/riscv_ebreak_test_0.S
-#		@   echo "Compiling riscv_ebreak_test_0.S"
-#		$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -c -o $(CUSTOM)/riscv_ebreak_test_0.o \
-#		$(CUSTOM)/riscv_ebreak_test_0.S -DRISCV32GC -O0 -nostdlib -nostartfiles \
-#		-I $(CUSTOM)
-#		@   echo "Linking riscv_ebreak_test_0.o"
-#		$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc \
-#		-o $(CUSTOM)/riscv_ebreak_test_0.elf \
-#		$(CUSTOM)/riscv_ebreak_test_0.o -nostdlib -nostartfiles \
-#		-T $(CUSTOM)/link.ld
+%debug_test.elf:
+	$(RISCV_EXE_PREFIX)gcc -mabi=ilp32 -march=rv32imc -o $@ \
+		-Wall -pedantic -Os -g -nostartfiles -static \
+		$(BSP_FILES) \
+		$(TEST_FILES) \
+		-T $(BSP)/link.ld
 
 # Patterned targets to generate ELF.  Used only if explicit targets do not match.
-# $@ is the file being generated.
-# $< is first prerequiste.
-# $^ is all prerequistes.
 #
 # This target selected if both %.c and %.S exist
 %.elf: %.c
@@ -455,6 +407,12 @@ firmware-vcs-run: vcsify $(FIRMWARE)/firmware.hex
 firmware-vcs-run-gui: VCS_FLAGS+=-debug_all
 firmware-vcs-run-gui: vcsify $(FIRMWARE)/firmware.hex
 	./simv $(SIMV_FLAGS) -gui "+firmware=$(FIRMWARE)/firmware.hex"
+
+.PHONY: vcs-unit-test
+vcs-unit-test:  firmware-unit-test-clean
+vcs-unit-test:  $(FIRMWARE)/firmware_unit_test.hex 
+vcs-unit-test:  vcsify $(FIRMWARE)/firmware_unit_test.hex
+vcs-unit-test:  vcs-run
 
 ###############################################################################
 # house-cleaning for unit-testing

@@ -35,7 +35,7 @@ DSIM_FILE_LIST ?= -f $(DV_UVMT_CV32_PATH)/uvmt_cv32.flist
 ifeq ($(USE_ISS),YES)
     DSIM_FILE_LIST         += -f $(DV_UVMT_CV32_PATH)/imperas_iss.flist
     DSIM_USER_COMPILE_ARGS += "+define+ISS"
-    DSIM_RUN_FLAGS         +="+USE_ISS"
+    DSIM_RUN_FLAGS         += +ovpcfg="--controlfile $(OVP_CTRL_FILE)"
 endif
 
 
@@ -163,6 +163,16 @@ hello-world: comp $(CUSTOM)/hello_world.hex $(CUSTOM)/hello_world.elf
 #		+nm_file=$(CUSTOM)/hello_world.nm
 #		+verbose
 
+debug_test: comp $(CORE_TEST_DIR)/debug_test/debug_test.hex
+	mkdir -p $(DSIM_RESULTS)/debug_test && cd $(DSIM_RESULTS)/debug_test  && \
+	$(DSIM) -l dsim-debug_test.log -image $(DSIM_IMAGE) \
+		-work $(DSIM_WORK) $(DSIM_RUN_FLAGS) $(DSIM_DMP_FLAGS) \
+		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+		-sv_lib $(OVP_MODEL_DPI) \
+    +UVM_TESTNAME=uvmt_cv32_firmware_test_c \
+    +firmware=$(CORE_TEST_DIR)/debug_test/debug_test.hex \
+    +elf_file=$(CORE_TEST_DIR)/debug_test/debug_test.elf \
+
 # Runs tests in riscv_tests/ only
 cv32-riscv-tests: comp $(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.hex $(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.elf
 	mkdir -p $(DSIM_RESULTS)/cv32-riscv-tests && cd $(DSIM_RESULTS)/cv32-riscv-tests && \
@@ -227,6 +237,96 @@ dsim-firmware-unit-test: comp
 .PHONY: unit-test
 unit-test: dsim-unit-test
 
+
+###############################################################################
+# Use Google instruction stream generator (RISCV-DV) to create new test-programs
+#riscv-dv: clone_riscv-dv
+comp_riscv-dv:
+	mkdir -p $(COREVDV_PKG)/out_$(DATE)/dsim
+	dsim -sv \
+		-work $(COREVDV_PKG)/out_$(DATE)/dsim \
+		-genimage image \
+		+incdir+$(UVM_HOME)/src \
+		$(UVM_HOME)/src/uvm_pkg.sv \
+		+define+DSIM \
+		-suppress EnumMustBePositive \
+		-suppress SliceOOB \
+		+incdir+$(RISCVDV_PKG)/target/rv32imc \
+		+incdir+$(RISCVDV_PKG)/user_extension \
+		+incdir+$(RISCVDV_PKG)/tests \
+		+incdir+$(COREVDV_PKG) \
+		-f $(COREVDV_PKG)/manifest.f \
+		-l $(COREVDV_PKG)/out_$(DATE)/dsim/compile.log 
+
+#riscv-test: riscv-dv
+#		+asm_file_name=$(RISCVDV_PKG)/out_2020-06-24/asm_tests/riscv_arithmetic_basic_test  \
+
+gen_corev_arithmetic_base_test:
+	dsim -sv_seed $(RNDSEED) \
+		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+		+acc+rwb \
+		-image image \
+		-work $(COREVDV_PKG)/out_$(DATE)/dsim \
+		+UVM_TESTNAME=corev_instr_base_test  \
+		+num_of_tests=2  \
+		+start_idx=0  \
+		+asm_file_name_opts=corev_arithmetic_base_test  \
+		-l $(COREVDV_PKG)/out_$(DATE)/sim_riscv_arithmetic_basic_test_0.log \
+		+instr_cnt=10000 \
+		+num_of_sub_program=0 \
+		+directed_instr_0=riscv_int_numeric_corner_stream,4 \
+		+no_fence=1 \
+		+no_data_page=1 \
+		+no_branch_jump=1 \
+		+boot_mode=m \
+		+no_csr_instr=1
+	mv *.S $(CORE_TEST_DIR)/custom
+
+gen_corev_rand_instr_test:
+	dsim  -sv_seed $(RNDSEED) \
+		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+		+acc+rwb \
+		-image image \
+		-work $(COREVDV_PKG)/out_$(DATE)/dsim \
+	 	+UVM_TESTNAME=corev_instr_base_test \
+		+num_of_tests=2  \
+		+start_idx=0  \
+		+asm_file_name_opts=corev_rand_instr_test  \
+		-l $(COREVDV_PKG)/out_$(DATE)/sim_riscv_rand_instr_test_0.log \
+    +instr_cnt=10000 \
+    +num_of_sub_program=5 \
+    +directed_instr_0=riscv_load_store_rand_instr_stream,4 \
+    +directed_instr_1=riscv_loop_instr,4 \
+    +directed_instr_2=riscv_hazard_instr_stream,4 \
+    +directed_instr_3=riscv_load_store_hazard_instr_stream,4 \
+    +directed_instr_4=riscv_multi_page_load_store_instr_stream,4 \
+    +directed_instr_5=riscv_mem_region_stress_test,4 \
+    +directed_instr_6=riscv_jal_instr,4
+	mv *.S $(CORE_TEST_DIR)/custom
+
+gen_corev_jump_stress_test:
+	dsim  -sv_seed $(RNDSEED) \
+		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+		+acc+rwb \
+		-image image \
+		-work $(COREVDV_PKG)/out_$(DATE)/dsim \
+	 	+UVM_TESTNAME=corev_instr_base_test \
+		+num_of_tests=2  \
+		+start_idx=0  \
+		+asm_file_name_opts=corev_jump_stress_test  \
+		-l $(COREVDV_PKG)/out_$(DATE)/sim_riscv_jump_stress_test_0.log \
+		+instr_cnt=5000 \
+		+num_of_sub_program=5 \
+		+directed_instr_1=riscv_jal_instr,20
+	mv *.S $(CORE_TEST_DIR)/custom
+
+corev-dv: clean_riscv-dv \
+	  clone_riscv-dv \
+	  comp_riscv-dv \
+	  gen_corev_arithmetic_base_test \
+	  gen_corev_rand_instr_test \
+	  gen_corev_jump_stress_test
+
 ###############################################################################
 # Clean up your mess!
 
@@ -244,5 +344,5 @@ clean:
 	rm -rf $(DSIM_RESULTS)
 
 # All generated files plus the clone of the RTL
-clean_all: clean clean_core_tests clean_riscvdv clean_test_programs
+clean_all: clean clean_core_tests clean_riscv-dv clean_test_programs
 	rm -rf $(CV32E40P_PKG)
