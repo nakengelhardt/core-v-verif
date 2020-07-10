@@ -12,4 +12,18 @@ copy-unit-test:
 firmware.hex: $(FIRMWARE)/firmware.hex
 	cp $< $@
 
+firmware.elf: $(FIRMWARE)/firmware.elf
+	cp $< $@
+
+custom-%.hex: $(CUSTOM_DIR)/%.hex
+	cp $< $@
+
+custom-%.elf: $(CUSTOM_DIR)/%.elf
+	cp $< $@
+
+asm-%.hex: $(ASM_DIR)/%.hex
+	cp $< $@
+
+asm-%.elf: $(ASM_DIR)/%.elf
+	cp $< $@
 
