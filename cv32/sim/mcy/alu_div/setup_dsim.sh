@@ -1,13 +1,14 @@
 #!/bin/bash
 
+set -e
+
 source params.sh
 
 PROJ_ROOT_DIR=$PWD/../../../..
 
-MAKEFILE=setup_dsim.mk
+cd database/setup
 
-#make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR build-unit-test div
-#make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR build-unit-test divu
+MAKEFILE=../../setup_dsim.mk
 
 make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR corev-dv
 

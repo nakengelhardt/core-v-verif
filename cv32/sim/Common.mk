@@ -260,17 +260,13 @@ TEST_FILES        = $(filter %.c %.S,$(wildcard $(dir $*)*))
 # Patterned targets to generate ELF.  Used only if explicit targets do not match.
 #
 # This target selected if both %.c and %.S exist
-%.elf: %.c
-	make clean-bsp
-	make bsp
+%.elf: %.c | clean-bsp bsp
 	$(RISCV_EXE_PREFIX)gcc $(CFLAGS) -o $@ \
 		-nostartfiles \
 		$^ -T $(BSP)/link.ld -L $(BSP) -lcv-verif
 
 # This target selected if only %.S exists
-%.elf: %.S
-	make clean-bsp
-	make bsp
+%.elf: %.S | clean-bsp bsp
 	$(RISCV_EXE_PREFIX)gcc $(CFLAGS) -o $@ \
 		-nostartfiles \
 		-I $(ASM) \

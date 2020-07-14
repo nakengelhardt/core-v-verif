@@ -34,8 +34,8 @@ echo "mutated.sv" >> mutated_manifest.flist
 MAKEFLAGS="CV32E40P_MANIFEST=mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR"
 MAKEFILE=../../Makefile
 make -f $MAKEFILE $MAKEFLAGS testbench_verilator
-ln -s ../../div_only_firmware.hex
-ln -s ../../firmware.hex
+ln -s ../../database/setup/div_only_firmware.hex
+ln -s ../../database/setup/firmware.hex
 
 # for each mutation (listed in input.txt)
 while read idx mut; do

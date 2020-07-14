@@ -3,6 +3,9 @@ VERI_CFLAGS += -DMCY
 
 include $(PROJ_ROOT_DIR)/cv32/sim/core/Makefile
 
+.PHONY: clone
+clone: $(CV32E40P_PKG)
+
 DIV_ONLY_FIRMWARE = $(CORE_TEST_DIR)/div_only_firmware
 DIV_ONLY_FIRMWARE_OBJS = $(addprefix $(DIV_ONLY_FIRMWARE)/, start.o print.o stats.o)
 DIV_ONLY_TEST_OBJS =$(RISCV_TESTS)/rv32um/div.o $(RISCV_TESTS)/rv32um/divu.o $(RISCV_TESTS)/rv32um/rem.o $(RISCV_TESTS)/rv32um/remu.o
