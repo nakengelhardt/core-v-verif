@@ -57,7 +57,8 @@ CV32E40P_BRANCH ?= master
 #2020-07-07
 #CV32E40P_HASH   ?= 8a3345cd80db4097cd007697233e54f020245bfb
 #2020-07-09
-CV32E40P_HASH   ?= 63b5a87d49072b5ea0574d354128d621ee95d7f6
+CV32E40P_HASH ?= 3deb55860001f8ac39cefa80b90566170b12391f
+
 
 FPNEW_REPO      ?= https://github.com/pulp-platform/fpnew
 FPNEW_BRANCH    ?= master
@@ -135,6 +136,10 @@ RISCV            ?= /opt/riscv
 RISCV_EXE_PREFIX ?= $(RISCV)/bin/riscv32-unknown-elf-
 
 CFLAGS ?= -Os -g -static -mabi=ilp32 -march=rv32imc -Wall -pedantic
+
+ifeq ($(firstword $(subst _, ,$(CUSTOM_PROG))),pulp)
+  CFLAGS = -Os -g -D__riscv__=1 -D__LITTLE_ENDIAN__=1 -march=rv32imcxpulpv2 -Wa,-march=rv32imcxpulpv2 -fdata-sections -ffunction-sections -fdiagnostics-color=always
+endif
 
 # CORE FIRMWARE vars. All of the C and assembler programs under CORE_TEST_DIR
 # are collectively known as "Core Firmware".  Yes, this is confusing because
@@ -260,6 +265,7 @@ TEST_FILES        = $(filter %.c %.S,$(wildcard $(dir $*)*))
 # Patterned targets to generate ELF.  Used only if explicit targets do not match.
 #
 # This target selected if both %.c and %.S exist
+.PRECIOUS : %.elf
 %.elf: %.c | clean-bsp bsp
 	$(RISCV_EXE_PREFIX)gcc $(CFLAGS) -o $@ \
 		-nostartfiles \
