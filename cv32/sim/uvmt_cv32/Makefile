@@ -181,12 +181,12 @@ clean_core_tests:
 	find $(CORE_TEST_DIR) -name corev_*.S -exec rm {} \;
 
 clean_test_programs:
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.o   -exec rm {} \;
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.hex -exec rm {} \;
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.elf -exec rm {} \;
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.map -exec rm {} \;
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.readelf -exec rm {} \;
-	find $(CORE_TEST_DIR)/../tests/uvmt_cv32/test-programs -name *.objdump -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.o   -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.hex -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.elf -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.map -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.readelf -exec rm {} \;
+	find $(CORE_TEST_DIR)/../uvmt_cv32/test-programs -name *.objdump -exec rm {} \;
 
 clean_riscv-dv:
 	rm -rf $(RISCVDV_PKG)

@@ -43,6 +43,7 @@
 MAKE          = make
 WAVES         = 0
 COREV_PROJ    = cv32
+MAKE_DIR      = $(PWD)
 PROJ_ROOT_DIR = $(PWD)/../../..
 
 # Compile compile flags for all simulators
@@ -117,7 +118,7 @@ TBSRC_TOP   := $(TBSRC_HOME)/core/tb_top.sv
 TBSRC_CORE  := $(TBSRC_HOME)/core
 TBSRC_PKG   := $(TBSRC_CORE)/tb_riscv/include/perturbation_defines.sv
 TBSRC       := $(TBSRC_CORE)/tb_top.sv \
-               $(TBSRC_CORE)/riscv_wrapper.sv \
+               $(TBSRC_CORE)/cv32e40p_tb_wrapper.sv \
                $(TBSRC_CORE)/mm_ram.sv \
                $(TBSRC_CORE)/dp_ram.sv \
                $(TBSRC_CORE)/tb_riscv/riscv_random_stall.sv \
@@ -127,7 +128,7 @@ RTLSRC_VLOG_TB_TOP	:= $(basename $(notdir $(TBSRC_TOP)))
 RTLSRC_VOPT_TB_TOP	:= $(addsuffix _vopt, $(RTLSRC_VLOG_TB_TOP))
 
 TBSRC_VERI  := $(TBSRC_CORE)/tb_top_verilator.sv \
-               $(TBSRC_CORE)/riscv_wrapper.sv \
+               $(TBSRC_CORE)/cv32e40p_tb_wrapper.sv \
                $(TBSRC_CORE)/mm_ram.sv \
                $(TBSRC_CORE)/dp_ram.sv
 SIM_LIBS    := $(PROJ_ROOT_DIR)/lib/sim_libs
@@ -143,7 +144,11 @@ CV32E40P_RTLSRC_PKG  := $(CV32E40P_PKG)/rtl/fpnew/src/fpnew_pkg.sv \
 CV32E40P_RTLSRC  := $(filter-out $(CV32E40P_PKG)/rtl/cv32e40p_register_file_latch.sv, \
                 $(wildcard $(CV32E40P_PKG)/rtl/*.sv))
 FPNEW_PKG            := $(CV32E40P_PKG)/rtl/fpnew
-CV32E40P_MANIFEST    := $(CV32E40P_PKG)/cv32e40p_manifest.flist
+# FIXME: temporarily using a local manifest for the core.
+#        This is BAD PRACTICE and will be fixed with
+#        https://github.com/openhwgroup/cv32e40p/pull/421 is resolved.
+#CV32E40P_MANIFEST    := $(CV32E40P_PKG)/cv32e40p_manifest.flist
+CV32E40P_MANIFEST    := cv32e40p_temp_manifest.flist
 export DESIGN_RTL_DIR = $(CV32E40P_PKG)/rtl
 
 # Shorthand rules for convience
@@ -212,7 +217,7 @@ dsim-comp: mk_results cv32e40p_pkg tbsrc_pkg tbsrc
 		$(DSIM) \
 		$(DSIM_CMP_FLAGS) \
 		$(DSIM_UVM_ARGS) \
-		-f $(CV32E40P_MANIFEST) \
+		-f $(MAKE_DIR)/$(CV32E40P_MANIFEST) \
 		$(TBSRC_PKG) \
 		$(TBSRC) \
 		-work $(DSIM_WORK) \

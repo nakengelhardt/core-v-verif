@@ -8,10 +8,12 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
-// Wrapper for a RI5CY testbench, containing RI5CY, Memory and stdout peripheral
+// Wrapper for a CV32E40P testbench, containing CV32E40P, Memory and stdout peripheral
 // Contributor: Robert Balas <balasr@student.ethz.ch>
+// Module renamed from riscv_wrapper to cv32e40p_tb_wrapper because (1) the
+// name of the core changed, and (2) the design has a cv32e40p_wrapper module.
 
-module riscv_wrapper
+module cv32e40p_tb_wrapper
     #(parameter // Parameters used by TB
                 INSTR_RDATA_WIDTH = 32,
                 RAM_ADDR_WIDTH    = 20,
@@ -19,7 +21,7 @@ module riscv_wrapper
                 DM_HALTADDRESS    = 32'h1A11_0800,
                 HART_ID           = 32'h0000_0000,
                 // Parameters used by DUT
-                PULP_HWLP         = 0,
+                PULP_XPULP        = 1,
                 PULP_CLUSTER      = 0,
                 FPU               = 0,
                 PULP_ZFINX        = 0,
@@ -66,13 +68,13 @@ module riscv_wrapper
 
     // instantiate the core
     cv32e40p_core #(
-                 .PULP_HWLP        (PULP_HWLP),
+                 .PULP_XPULP       (PULP_XPULP),
                  .PULP_CLUSTER     (PULP_CLUSTER),
                  .FPU              (FPU),
                  .PULP_ZFINX       (PULP_ZFINX),
                  .NUM_MHPMCOUNTERS (NUM_MHPMCOUNTERS)
                 )
-    riscv_core_i
+    cv32e40p_core_i
         (
          .clk_i                  ( clk_i                 ),
          .rst_ni                 ( rst_ni                ),
@@ -159,11 +161,11 @@ module riscv_wrapper
 
          .debug_req_o    ( debug_req                      ),
 
-         .pc_core_id_i   ( riscv_core_i.pc_id             ),
+         .pc_core_id_i   ( cv32e40p_core_i.pc_id          ),
 
          .tests_passed_o ( tests_passed_o                 ),
          .tests_failed_o ( tests_failed_o                 ),
          .exit_valid_o   ( exit_valid_o                   ),
          .exit_value_o   ( exit_value_o                   ));
 
-endmodule // riscv_wrapper
+endmodule // cv32e40p_tb_wrapper
