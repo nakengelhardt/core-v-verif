@@ -1,0 +1,5 @@
+export SIMULATOR=dsim
+
+CUSTOM_PROGS="hello_world riscv_ebreak_test_0 riscv_arithmetic_basic_test_0 riscv_arithmetic_basic_test_1 corev_arithmetic_base_test_0 corev_arithmetic_base_test_1 corev_rand_instr_test_0 corev_rand_instr_test_1 corev_jump_stress_test_0 corev_jump_stress_test_1 illegal fibonacci misalign dhrystone"
+
+# ASM_PROGS=""

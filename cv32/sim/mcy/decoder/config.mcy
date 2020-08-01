@@ -9,12 +9,13 @@ bash setup_dsim.sh
 [script]
 verific -work fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
 verific -work cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
-verific -L cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
-prep -top cv32e40p_alu_div
-pmuxtree
+verific -work cv32e40p_apu_core_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_apu_core_pkg.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_decoder.sv
+prep -top cv32e40p_decoder
+
 
 [files]
-../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_decoder.sv
 
 [logic]
 if result("test_sim") == "FAIL":
