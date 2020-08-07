@@ -29,7 +29,8 @@ echo "$PWD/mutated.sv" >> mutated_manifest.flist
 
 export SIMULATOR=dsim
 MAKEFILE=../../test_dsim.mk
-MAKEFLAGS="CV32E40P_MANIFEST=$PWD/mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR"
+MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
+MAKEFLAGS="CV32E40P_MANIFEST=$PWD/mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH"
 for PROG in $CUSTOM_PROGS ; do
 	ln -s ../../database/setup/custom-$PROG.hex
 	ln -s ../../database/setup/custom-$PROG.elf
