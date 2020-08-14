@@ -1,5 +1,5 @@
 [options]
-size 1000
+size 100
 tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 
 [setup]
@@ -18,28 +18,30 @@ prep -top cv32e40p_decoder
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_decoder.sv
 
 [logic]
+
+if result("test_eq") == "PASS":
+  if rng(100) < 20:
+    tag("PROBE")
+    if result("test_sim") == "FAIL":
+      tag("FMGAP")
+      return
+    if result("test_dsim") == "FAIL":
+      tag("FMGAP")
+      return
+  tag("NOCHANGE")
+  return
+
 if result("test_sim") == "FAIL":
   tag("COVERED")
   tag("VERI")
-  if rng(100) < 20:
-    tag("PROBE")
-    if result("test_eq") == "PASS":
-      tag("FMGAP")
   return
-elif result("test_dsim") == "FAIL":
+if result("test_dsim") == "FAIL":
   tag("COVERED")
   tag("UVM")
-  if rng(100) < 20:
-    tag("PROBE")
-    if result("test_eq") == "PASS":
-      tag("FMGAP")
   return
 
-if result("test_eq") == "FAIL":
-  tag("UNCOVERED")
-  return
+tag("UNCOVERED")
 
-tag("NOCHANGE")
 
 [report]
 if tags("FMGAP"):

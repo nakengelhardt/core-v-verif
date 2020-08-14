@@ -434,9 +434,10 @@ cv32e40p_decoder uut_i (
 );
 
 always @(*) begin
+assert(ref_illegal_insn_o == uut_illegal_insn_o);
+if (~ref_illegal_insn_o) begin
 assert(ref_instr_multicycle_o == uut_instr_multicycle_o);      
 
-assert(ref_illegal_insn_o == uut_illegal_insn_o);          
 assert(ref_ebrk_insn_o == uut_ebrk_insn_o);             
 
 assert(ref_mret_insn_o == uut_mret_insn_o); 
@@ -526,6 +527,7 @@ assert(ref_hwloop_cnt_mux_sel_o == uut_hwloop_cnt_mux_sel_o);
 assert(ref_jump_in_dec_o == uut_jump_in_dec_o);
 assert(ref_jump_in_id_o == uut_jump_in_id_o);
 assert(ref_jump_target_mux_sel_o == uut_jump_target_mux_sel_o);
+end
 end
 
 endmodule

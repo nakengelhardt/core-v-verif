@@ -9,5 +9,5 @@ MAKEFILE=Makefile
 
 make -f $MAKEFILE $MAKEFLAGS clone
 
-make -f $MAKEFILE $MAKEFLAGS $TEST_DIR/firmware/firmware.hex
-cp $TEST_DIR/firmware/firmware.hex database/setup/firmware.hex
+make -f $MAKEFILE $MAKEFLAGS $TEST_DIR/cv32_riscv_tests_firmware/cv32_riscv_tests_firmware.hex
+cp $TEST_DIR/cv32_riscv_tests_firmware/cv32_riscv_tests_firmware.hex database/setup/firmware.hex

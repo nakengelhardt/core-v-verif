@@ -9,15 +9,17 @@ PROJ_ROOT_DIR=$PWD/../../../..
 cd database/setup
 
 MAKEFILE=../../setup_dsim.mk
+MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
+MAKEFLAGS="PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH"
 
-make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR corev-dv
+make -f $MAKEFILE $MAKEFLAGS corev-dv
 
-make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR firmware.hex firmware.elf
+make -f $MAKEFILE $MAKEFLAGS firmware.hex firmware.elf
 
 for PROG in $CUSTOM_PROGS ; do
-make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR custom-$PROG.hex custom-$PROG.elf
+make -f $MAKEFILE $MAKEFLAGS custom-$PROG.hex custom-$PROG.elf
 done
 
 for PROG in $ASM_PROGS ; do
-make -f $MAKEFILE PROJ_ROOT_DIR=$PROJ_ROOT_DIR asm-$PROG.hex asm-$PROG.elf
+make -f $MAKEFILE $MAKEFLAGS asm-$PROG.hex asm-$PROG.elf
 done

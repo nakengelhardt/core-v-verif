@@ -18,8 +18,10 @@ set -ex
 # export mutated.sv
 yosys -ql mutate.log mutate.ys
 
-# expected error count
-EXPECT_NUM_ERRORS=3
+# expected phrase
+EXPECT_MSG="ALL TESTS PASSED"
+# expected time the phrase should appear in output
+EXPECT_NUM=1
 
 # locations
 PROJ_ROOT_DIR=$PWD/../../../../../..
@@ -42,7 +44,7 @@ ln -s ../../database/setup/firmware.hex
 while read idx mut; do
 	timeout 1m ./testbench_verilator +firmware=firmware.hex --mutidx ${idx} > sim_${idx}.out || true
 
-	if [[ `grep -c "ERROR" sim_${idx}.out` -ne $EXPECT_NUM_ERRORS ]]
+	if [[ `grep -c "$EXPECT_MSG" sim_${idx}.out` -ne $EXPECT_NUM ]]
 	then
 		echo "${idx} FAIL" >> output.txt
 		continue
