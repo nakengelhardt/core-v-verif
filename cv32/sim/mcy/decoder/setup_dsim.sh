@@ -16,8 +16,8 @@ make -f $MAKEFILE $MAKEFLAGS corev-dv
 
 make -f $MAKEFILE $MAKEFLAGS firmware.hex firmware.elf
 
-for PROG in $CUSTOM_PROGS ; do
-make -f $MAKEFILE $MAKEFLAGS custom-$PROG.hex custom-$PROG.elf
+for PROG in $CUSTOM_PROGS $PULP_CUSTOM_PROGS ; do
+make -f $MAKEFILE $MAKEFLAGS CUSTOM_PROG=$PROG custom-$PROG.hex custom-$PROG.elf
 done
 
 for PROG in $ASM_PROGS ; do

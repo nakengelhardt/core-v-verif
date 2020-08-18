@@ -42,6 +42,17 @@ for PROG in $CUSTOM_PROGS ; do
 	fi
 done
 
+for PROG in $PULP_CUSTOM_PROGS ; do
+	ln -s ../../database/setup/custom-$PROG.hex
+	ln -s ../../database/setup/custom-$PROG.elf
+
+	make -f $MAKEFILE $MAKEFLAGS USE_ISS=NO dsim-custom-$PROG
+	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
+		echo "1 FAIL" > output.txt
+		exit 0
+	fi
+done
+
 # disabled - currently known to fail
 #ln -s ../../database/setup/firmware.hex
 #ln -s ../../database/setup/firmware.elf
