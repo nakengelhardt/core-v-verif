@@ -68,8 +68,13 @@ BANNER=*************************************************************************
 
 CV32E40P_REPO   ?= https://github.com/openhwgroup/cv32e40p
 CV32E40P_BRANCH ?= master
+#2020-08-28
+CV32E40P_HASH   ?= a5ec2db5cc3eabb6d0315658f11ae8e82bbf994d
+#CV32E40P_HASH   ?= 7c65d1a6cbbcbc7eb20abfd1a83988c94e4fd175
+#2020-08-18
+#CV32E40P_HASH   ?= 1607d8b675864db1aa013364fd4444a665331830
 #2020-07-16
-CV32E40P_HASH   ?= 916d92afc6bbc27b7ab65c503043982e1b6e3ab0
+#CV32E40P_HASH   ?= 916d92afc6bbc27b7ab65c503043982e1b6e3ab0
 #2020-07-09
 #CV32E40P_HASH   ?= 3deb55860001f8ac39cefa80b90566170b12391f
 #2020-07-07
@@ -78,8 +83,10 @@ CV32E40P_HASH   ?= 916d92afc6bbc27b7ab65c503043982e1b6e3ab0
 
 FPNEW_REPO      ?= https://github.com/pulp-platform/fpnew
 FPNEW_BRANCH    ?= master
+#2020-08-27
+FPNEW_HASH      ?= a0c021c360abcc94e434d41974a52bdcbf14d156
 #Note: this is one merge behind the head (as of 2020-06-11)
-FPNEW_HASH      ?= f108dfdd84f7c24dcdefb35790fafb3905bce552
+#FPNEW_HASH      ?= f108dfdd84f7c24dcdefb35790fafb3905bce552
 #Note: this is head (as of 2020-06-11).  Can't use it because of the worm
 #FPNEW_HASH      ?= babffe88fcf6d2931a7afa8d121b6a6ba4f532f7
 
@@ -140,7 +147,7 @@ DV_OVPM_HOME    = $(PROJ_ROOT_DIR)/vendor_lib/imperas
 DV_OVPM_MODEL   = $(DV_OVPM_HOME)/riscv_CV32E40P_OVPsim
 DV_OVPM_DESIGN  = $(DV_OVPM_HOME)/design
 OVP_MODEL_DPI   = $(DV_OVPM_MODEL)/bin/Linux64/riscv_CV32E40P.dpi.so
-OVP_CTRL_FILE   = $(DV_OVPM_DESIGN)/riscv_CV32E40P.ic
+#OVP_CTRL_FILE   = $(DV_OVPM_DESIGN)/riscv_CV32E40P.ic
 
 ###############################################################################
 # Build "firmware" for the CV32E40P "core" testbench and "uvmt_cv32"
@@ -243,7 +250,7 @@ sanity: hello-world
 		--change-section-address  .debugger=0x3FC000 \
 		--change-section-address  .debugger_exception=0x3FC800
 	$(RISCV_EXE_PREFIX)readelf -a $< > $*.readelf
-	$(RISCV_EXE_PREFIX)objdump -D $*.elf > $*.objdump
+	$(RISCV_EXE_PREFIX)objdump -D -S $*.elf > $*.objdump
 
 bsp:
 	make -C $(BSP)

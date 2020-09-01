@@ -22,6 +22,7 @@
 `include "uvm_macros.svh"
 `include "uvml_hrtbt_macros.sv"
 `include "uvml_sb_macros.sv"
+
 `include "uvma_clknrst_macros.sv"
 `include "uvme_cv32_macros.sv"
 
@@ -35,7 +36,9 @@ package uvme_cv32_pkg;
    import uvm_pkg         ::*;
    import uvml_hrtbt_pkg  ::*;
    import uvml_sb_pkg     ::*;
+   import uvml_trn_pkg    ::*;  
    import uvma_clknrst_pkg::*;
+   import uvma_interrupt_pkg::*;
    //import uvma_debug_pkg::*;
    
    // Constants / Structs / Enums
@@ -48,11 +51,14 @@ package uvme_cv32_pkg;
    // Objects
    `include "uvme_cv32_cfg.sv"
    `include "uvme_cv32_cntxt.sv"
-   
+   `include "uvme_rv32isa_covg_trn.sv"
+
    // Predictor
    `include "uvme_cv32_prd.sv"
    
    // Environment components
+   `include "uvme_interrupt_covg.sv"
+   `include "uvme_rv32isa_covg.sv"
    `include "uvme_cv32_cov_model.sv"
    `include "uvme_cv32_sb.sv"
    `include "uvme_cv32_vsqr.sv"
@@ -61,6 +67,7 @@ package uvme_cv32_pkg;
    // Virtual sequences
    `include "uvme_cv32_base_vseq.sv"
    `include "uvme_cv32_reset_vseq.sv"
+   `include "uvme_cv32_interrupt_noise_vseq.sv"
    `include "uvme_cv32_reg_base_vseq.sv"
    `include "uvme_cv32_reg_bit_bash_vseq.sv"
    `include "uvme_cv32_reg_hw_reset_vseq.sv"

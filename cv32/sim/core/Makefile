@@ -40,11 +40,14 @@
 #
 ###############################################################################
 
-MAKE          = make
-WAVES         = 0
-COREV_PROJ    = cv32
+# "Constants"
+MAKE           = make
 MAKE_DIR      = $(PWD)
-PROJ_ROOT_DIR = $(PWD)/../../..
+MAKE_PATH     := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+COREV_PROJ     = cv32
+PROJ_ROOT_DIR  = $(abspath $(MAKE_PATH)/../../..)
+DATE           = $(shell date +%F)
+WAVES         = 0
 
 # Compile compile flags for all simulators
 SV_CMP_FLAGS = 
@@ -77,7 +80,7 @@ VCS_HOME                = /opt/synopsys/vcs-mx/$(VCS_VERSION)
 VCS                     = vcs
 VCS_FLAGS               ?= # user defined
 ALL_VCS_FLAGS               = $(VCS_FLAGS)
-VCS_SCRIPT_DIR	        = ../vcs
+VCS_SCRIPT_DIR	        = ../tools/vcs
 VCS_SCRIPT              = $(VCS_SCRIPT_DIR)/vcs_batch.tcl
 VCS_SCRIPT_GUI          = $(VCS_SCRIPT_DIR)/vcs.tcl
 SIMV                    = ./simv
@@ -85,7 +88,7 @@ SIMV                    = ./simv
 # dsim is the Metrics Technologies SystemVerilog simulator  (https://metrics.ca/)
 DSIM                    = dsim
 DSIM_HOME               = /tools/Metrics/dsim
-DSIM_CMP_FLAGS          = -timescale 1ns/1ps $(SV_CMP_FLAGS)
+DSIM_CMP_FLAGS          = -timescale 1ns/1ps $(SV_CMP_FLAGS) +define+CV32E40P_APU_TRACE
 DSIM_RUN_FLAGS          = -write-sql
 DSIM_UVM_ARGS           = +incdir+$(UVM_HOME)/src $(UVM_HOME)/src/uvm_pkg.sv
 DSIM_RESULTS           ?= $(PWD)/results
@@ -100,7 +103,7 @@ endif
 
 # xrun is the Cadence xcelium SystemVerilog simulator (https://cadence.com/)
 XRUN              = xrun
-XRUN_FLAGS        = -clean -smartorder -sv -top worklib.tb_top -timescale 1ns/1ps
+XRUN_FLAGS        = -clean -smartorder -sv -top worklib.tb_top -timescale 1ns/1ps +define+CV32E40P_APU_TRACE
 XRUN_DIR          = xcelium.d
 
 # verilator configuration
@@ -147,9 +150,12 @@ FPNEW_PKG            := $(CV32E40P_PKG)/rtl/fpnew
 # FIXME: temporarily using a local manifest for the core.
 #        This is BAD PRACTICE and will be fixed with
 #        https://github.com/openhwgroup/cv32e40p/pull/421 is resolved.
-#CV32E40P_MANIFEST    := $(CV32E40P_PKG)/cv32e40p_manifest.flist
-CV32E40P_MANIFEST    := cv32e40p_temp_manifest.flist
+CV32E40P_MANIFEST    := $(CV32E40P_PKG)/cv32e40p_manifest.flist
+#CV32E40P_MANIFEST    := cv32e40p_temp_manifest.flist
 export DESIGN_RTL_DIR = $(CV32E40P_PKG)/rtl
+
+# Default "custom test-program"
+CUSTOM_PROG  ?= requested_csr_por
 
 # Shorthand rules for convience
 cv32e40p_pkg: $(CV32E40P_PKG)
@@ -217,7 +223,7 @@ dsim-comp: mk_results cv32e40p_pkg tbsrc_pkg tbsrc
 		$(DSIM) \
 		$(DSIM_CMP_FLAGS) \
 		$(DSIM_UVM_ARGS) \
-		-f $(MAKE_DIR)/$(CV32E40P_MANIFEST) \
+		-f $(CV32E40P_MANIFEST) \
 		$(TBSRC_PKG) \
 		$(TBSRC) \
 		-work $(DSIM_WORK) \
@@ -244,9 +250,17 @@ dsim-hello_world: dsim-comp $(CUSTOM)/hello_world.hex
 		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
 		-sv_lib $(OVP_MODEL_DPI)  \
 		+firmware=$(CUSTOM)/hello_world.hex \
-		+elf_file=$(CUSTOM)/hello_world.elf \
-		+nm_file=$(CUSTOM)/hello_world.nm
+		+elf_file=$(CUSTOM)/hello_world.elf
 #		+verbose
+
+dsim-custom: dsim-comp $(CUSTOM)/$(CUSTOM_PROG).hex
+	mkdir -p $(DSIM_RESULTS)/$(CUSTOM_PROG) && cd $(DSIM_RESULTS)/$(CUSTOM_PROG)  && \
+	$(DSIM) -l dsim-requested_csr_por.log -image $(DSIM_IMAGE) \
+		-work $(DSIM_WORK) $(DSIM_RUN_FLAGS) \
+		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+		-sv_lib $(OVP_MODEL_DPI)  \
+		+firmware=$(CUSTOM)/$(CUSTOM_PROG).hex \
+		+elf_file=$(CUSTOM)/$(CUSTOM_PROG).elf
 
 # Runs tests in riscv_tests/ only
 dsim-cv32_riscv_tests: dsim-comp $(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.hex
@@ -256,8 +270,7 @@ dsim-cv32_riscv_tests: dsim-comp $(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_f
 		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
 		-sv_lib $(OVP_MODEL_DPI)  \
 		+firmware=$(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.hex \
-		+elf_file=$(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.elf \
-		+nm_file=$(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.nm
+		+elf_file=$(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.elf
 
 # Runs tests in riscv_compliance_tests/ only
 dsim-cv32_riscv_compliance_tests: dsim-comp $(CV32_RISCV_COMPLIANCE_TESTS_FIRMWARE)/cv32_riscv_compliance_tests_firmware.hex
@@ -267,8 +280,7 @@ dsim-cv32_riscv_compliance_tests: dsim-comp $(CV32_RISCV_COMPLIANCE_TESTS_FIRMWA
 		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
 		-sv_lib $(OVP_MODEL_DPI)  \
 		+firmware=$(CV32_RISCV_COMPLIANCE_TESTS_FIRMWARE)/cv32_riscv_compliance_tests_firmware.hex \
-		+elf_file=$(CV32_RISCV_COMPLIANCE_TESTS_FIRMWARE)/cv32_riscv_compliance_tests_firmware.elf \
-		+nm_file=$(CV32_RISCV_COMPLIANCE_TESTS_FIRMWARE)/cv32_riscv_compliance_tests_firmware.nm
+		+elf_file=$(CV32_RISCV_COMPLIANCE_TESTS_FIRMWARE)/cv32_riscv_compliance_tests_firmware.elf
 
 # Runs all tests in riscv_tests/ and riscv_compliance_tests/
 dsim-firmware: dsim-comp $(FIRMWARE)/firmware.hex
@@ -278,8 +290,7 @@ dsim-firmware: dsim-comp $(FIRMWARE)/firmware.hex
 		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
 		-sv_lib $(OVP_MODEL_DPI)  \
 		+firmware=$(FIRMWARE)/firmware.hex \
-		+elf_file=$(FIRMWARE)/firmware.elf \
-		+nm_file=$(FIRMWARE)/firmware.nm
+		+elf_file=$(FIRMWARE)/firmware.elf
 
 # Runs a "unit-test" (see rule dsim-unit-test in ../Common.mk)
 dsim-firmware-unit-test: dsim-comp
@@ -289,8 +300,7 @@ dsim-firmware-unit-test: dsim-comp
 		-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
 		-sv_lib $(OVP_MODEL_DPI)  \
 		+firmware=$(FIRMWARE)/firmware_unit_test.hex \
-		+elf_file=$(FIRMWARE)/firmware_unit_test.elf \
-		+nm_file=$(FIRMWARE)/firmware_unit_test.nm
+		+elf_file=$(FIRMWARE)/firmware_unit_test.elf
 
 # Metrics dsim cleanup
 .PHONY: dsim-clean
@@ -496,13 +506,13 @@ verilate-clean: tc-clean
 ###############################################################################
 # Synopsys VCS
 
-vcsify: $(CV32E40P_PKG) $(FPNEW_PKG) $(CV32E40P_RTLSRC_PKG) $(CV32E40P_RTLSRC) $(TBSRC_PKG) $(TBSRC)
+vcsify: cv32e40p_pkg tbsrc_pkg tbsrc
 	$(VCS) +vc -sverilog -race=all -ignore unique_checks -full64 \
 		-timescale=1ns/1ps \
 		-assert svaext \
 		-CC "-I$(VCS_HOME)/include -O3 -march=native" $(VCS_FLAGS) \
-		$(CV32E40P_RTLSRC_PKG) $(CV32E40P_RTLSRC) $(TBSRC_PKG) $(TBSRC) \
-		+incdir+$(CV32E40P_RTLSRC_INCDIR)
+		-f $(MAKE_DIR)/$(CV32E40P_MANIFEST) \
+		$(TBSRC_PKG) $(TBSRC)
 
 RTLSRC_TB_TOP	:= $(basename $(notdir $(TBSRC_TOP)))
 
@@ -516,6 +526,11 @@ vcs-run-gui: vcsify
 vcs-hello_world: vcsify $(CUSTOM)/hello_world.hex
 vcs-hello_world: ALL_VCS_FLAGS += +firmware=$(CUSTOM)/hello_world.hex
 vcs-hello_world: vcs-run
+
+.PHONY: vcs-custom
+vcs-custom: vcsify $(CUSTOM)/$(CUSTOM_PROG).hex
+vcs-custom: ALL_VCS_FLAGS += +firmware=$(CUSTOM)/$(CUSTOM_PROG).hex
+vcs-custom: vcs-run
 
 .PHONY: vcs-cv32_riscv_tests
 vcs-cv32_riscv_tests: vcsify $(CV32_RISCV_TESTS_FIRMWARE)/cv32_riscv_tests_firmware.hex

@@ -141,8 +141,8 @@ Current supported simulators: <i>Note that eventually all simulators will be sup
 |-----------|-----------|
 |dsim       | No        |
 |xrun       | Yes       |
-|questa     | No        |
-|vcs        | No        |
+|questa     | Yes       |
+|vcs        | Yes       |
 
 For certain simulators multiple debug tools are available that enable advanced debug capabilities but generally require respective licenses from the vendor.  By default all debug-related commands in this section will support a standard debug tool with the simulator.   However support is provided for advanced debug tools when avaiable.  The advanced debug tool is selected with each make command by setting the **ADV_DEBUG=YES** flag.
 
@@ -160,6 +160,15 @@ To run a simulation in interactive mode (to enable single-stepping, breakpoints,
 If applicable for a simulator, line debugging will be enabled in the compile to enable single-stepping.
 
 **make hello-world GUI=1**
+
+### Set the UVM quit count
+
+All error signaling and handling is routed through the standard UVM report server for all OpenHW testbenches.  By default the UVM is configured 
+to allow up to 5 errors to be signaled before aborting the test.  There is a run-time plusarg to configure this that should work for all
+tests.  Use the USER_RUN_FLAGS make variable with the standard UVM_MAX_QUIT_COUNT plusarg as below.  Please note that the NO is required
+and signals that you want UVM to use your plusarg over any internally configured quit count values.
+
+**make hello-world USER_RUN_FLAGS=+UVM_MAX_QUIT_COUNT=10,NO**
 
 ### Post-process Waveform Debug
 
@@ -209,7 +218,7 @@ Invoke GUI coverage browser for the hello-world test:
 
 An additional option to the **make cov** target exists to <i>merge</i> coverage.  To merge coverage the makefiles will look in **all** existing test results directories <i>for the selected simulator</i> and generate a merged coverage report in <i>&lt;simulator>_results/merged_cov</i>.  The respective coverage report of GUI invocation will use that directory as the coverage database.  Coverage merging is selected by setting the <i>MERGE=1</i> flag.
 
-Generate coverrage report for all executed tests with coverage databases.
+Generate coverage report for all executed tests with coverage databases.
 
 **make cov MERGE=1**
 
