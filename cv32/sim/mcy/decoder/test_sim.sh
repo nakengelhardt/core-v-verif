@@ -10,7 +10,7 @@ set -ex
 		# add multiple mutations to module, selectable with 'mutsel' input
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
-	echo "opt_rmdff" # workaround for verilator not supporting posedge 1'b1
+	echo "opt_dff" # workaround for verilator not supporting posedge 1'b1
 	echo "rename cv32e40p_decoder mutated"
 	echo "write_verilog -attr2comment mutated.sv"
 } > mutate.ys

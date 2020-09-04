@@ -1,0 +1,3 @@
+script read_sources.ys
+verific -template wrapper_dpi cv32e40p_decoder -width 8 -name mutated -out cv32e40p_decoder_wrapper_dpi.sv -chparam WAPUTYPE 1
+verific -template wrapper cv32e40p_decoder -name mutated -out cv32e40p_decoder_wrapper.sv -chparam WAPUTYPE 1
