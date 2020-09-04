@@ -7,7 +7,7 @@ set -ex
 {
 	echo "read_ilang ../../database/design.il"
 	while read -r idx mut; do
-		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
+		echo "mutate ${mut#* }"
 	done < input.txt
 	echo "opt_rmdff" # workaround for verilator not supporting posedge 1'b1
 	echo "rename cv32e40p_decoder mutated"
@@ -23,7 +23,7 @@ PROJ_ROOT_DIR=$PWD/../../../../../..
 
 # create modified manifest
 grep -v "cv32e40p_decoder.sv" $PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist > mutated_manifest.flist
-echo "../../cv32e40p_decoder_mutated_wrapper.sv" >> mutated_manifest.flist
+echo "../../cv32e40p_decoder_wrapper.sv" >> mutated_manifest.flist
 echo "$PWD/mutated.sv" >> mutated_manifest.flist
 
 

@@ -28,10 +28,10 @@ PROJ_ROOT_DIR=$PWD/../../../../../..
 TEST_DIR=$PROJ_ROOT_DIR/cv32/tests/core
 
 # create modified manifest
-#ORIG_MANIFEST="$PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist"
-ORIG_MANIFEST="$PROJ_ROOT_DIR/cv32/sim/core/cv32e40p_temp_manifest.flist"
+ORIG_MANIFEST="$PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist"
+#ORIG_MANIFEST="$PROJ_ROOT_DIR/cv32/sim/core/cv32e40p_temp_manifest.flist"
 grep -v "cv32e40p_decoder.sv" $ORIG_MANIFEST > mutated_manifest.flist
-echo "../../cv32e40p_decoder_wrapper.sv" >> mutated_manifest.flist
+echo "../../cv32e40p_decoder_wrapper_dpi.sv" >> mutated_manifest.flist
 echo "mutated.sv" >> mutated_manifest.flist
 
 # build verilator testbench with mutated module
@@ -42,7 +42,7 @@ ln -s ../../database/setup/firmware.hex
 
 # for each mutation (listed in input.txt)
 while read idx mut; do
-	timeout 1m ./testbench_verilator +firmware=firmware.hex --mutidx ${idx} > sim_${idx}.out
+	timeout 1m ./testbench_verilator +firmware=firmware.hex --mutidx ${idx} > sim_${idx}.out || true
 
 	if [[ `grep -c "$EXPECT_MSG" sim_${idx}.out` -ne $EXPECT_NUM ]]
 	then
