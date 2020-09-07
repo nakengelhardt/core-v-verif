@@ -33,7 +33,6 @@ module cv32e40p_decoder
     input logic deassert_we_i,  // deassert we, we are stalled or not active
     input logic data_misaligned_i,  // misaligned data load/store in progress
     input logic mult_multicycle_i,  // multiplier taking multiple cycles, using op c as storage
-    output logic instr_multicycle_o,  // true when multiple cycles are decoded
     output logic illegal_insn_o,  // illegal instruction encountered
     output logic ebrk_insn_o,  // trap instruction encountered
     output logic mret_insn_o,  // return from exception instruction encountered (M)
@@ -123,8 +122,9 @@ module cv32e40p_decoder
     // jump/branches
     output logic [1:0] ctrl_transfer_insn_in_dec_o,  // control transfer instruction without deassert
     output logic [1:0] ctrl_transfer_insn_in_id_o,  // control transfer instructio is decoded
-    output logic [1:0] ctrl_transfer_target_mux_sel_o // jump target selection
-        ) ;
+    output logic [1:0] ctrl_transfer_target_mux_sel_o,  // jump target selection
+    // HPM related control signals
+    input logic [31:0] mcounteren_i) ;
     if ((PULP_XPULP != 1)) 
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with PULP_XPULP = 1 but %0d was passed",PULP_XPULP) ;
     if ((PULP_CLUSTER != 0)) 
@@ -155,12 +155,12 @@ module cv32e40p_decoder
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with APU_WOP_CPU = 6 but %0d was passed",APU_WOP_CPU) ;
     if ((DEBUG_TRIGGER_EN != 1)) 
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with DEBUG_TRIGGER_EN = 1 but %0d was passed",DEBUG_TRIGGER_EN) ;
-    mutated wrapped_i (.deassert_we_i(deassert_we_i), .data_misaligned_i(data_misaligned_i), .mult_multicycle_i(mult_multicycle_i), .instr_multicycle_o(instr_multicycle_o), .illegal_insn_o(illegal_insn_o), .ebrk_insn_o(ebrk_insn_o), .mret_insn_o(mret_insn_o), .uret_insn_o(uret_insn_o), .dret_insn_o(dret_insn_o), .mret_dec_o(mret_dec_o), .uret_dec_o(uret_dec_o), .dret_dec_o(dret_dec_o), .ecall_insn_o(ecall_insn_o), .wfi_o(wfi_o), .fencei_insn_o(fencei_insn_o), 
-                .rega_used_o(rega_used_o), .regb_used_o(regb_used_o), .regc_used_o(regc_used_o), .reg_fp_a_o(reg_fp_a_o), .reg_fp_b_o(reg_fp_b_o), .reg_fp_c_o(reg_fp_c_o), .reg_fp_d_o(reg_fp_d_o), .bmask_a_mux_o(bmask_a_mux_o), .bmask_b_mux_o(bmask_b_mux_o), .alu_bmask_a_mux_sel_o(alu_bmask_a_mux_sel_o), .alu_bmask_b_mux_sel_o(alu_bmask_b_mux_sel_o), .instr_rdata_i(instr_rdata_i), .illegal_c_insn_i(illegal_c_insn_i), .alu_en_o(alu_en_o), .alu_operator_o(alu_operator_o), 
-                .alu_op_a_mux_sel_o(alu_op_a_mux_sel_o), .alu_op_b_mux_sel_o(alu_op_b_mux_sel_o), .alu_op_c_mux_sel_o(alu_op_c_mux_sel_o), .alu_vec_mode_o(alu_vec_mode_o), .scalar_replication_o(scalar_replication_o), .scalar_replication_c_o(scalar_replication_c_o), .imm_a_mux_sel_o(imm_a_mux_sel_o), .imm_b_mux_sel_o(imm_b_mux_sel_o), .regc_mux_o(regc_mux_o), .is_clpx_o(is_clpx_o), .is_subrot_o(is_subrot_o), .mult_operator_o(mult_operator_o), .mult_int_en_o(mult_int_en_o), .mult_dot_en_o(mult_dot_en_o), .mult_imm_mux_o(mult_imm_mux_o), 
-                .mult_sel_subword_o(mult_sel_subword_o), .mult_signed_mode_o(mult_signed_mode_o), .mult_dot_signed_o(mult_dot_signed_o), .frm_i(frm_i), .fpu_dst_fmt_o(fpu_dst_fmt_o), .fpu_src_fmt_o(fpu_src_fmt_o), .fpu_int_fmt_o(fpu_int_fmt_o), .apu_en_o(apu_en_o), .apu_type_o(apu_type_o), .apu_op_o(apu_op_o), .apu_lat_o(apu_lat_o), .apu_flags_src_o(apu_flags_src_o), .fp_rnd_mode_o(fp_rnd_mode_o), .regfile_mem_we_o(regfile_mem_we_o), .regfile_alu_we_o(regfile_alu_we_o), 
-                .regfile_alu_we_dec_o(regfile_alu_we_dec_o), .regfile_alu_waddr_sel_o(regfile_alu_waddr_sel_o), .csr_access_o(csr_access_o), .csr_status_o(csr_status_o), .csr_op_o(csr_op_o), .current_priv_lvl_i(current_priv_lvl_i), .data_req_o(data_req_o), .data_we_o(data_we_o), .prepost_useincr_o(prepost_useincr_o), .data_type_o(data_type_o), .data_sign_extension_o(data_sign_extension_o), .data_reg_offset_o(data_reg_offset_o), .data_load_event_o(data_load_event_o), .atop_o(atop_o), .hwlp_we_o(hwlp_we_o), 
-                .hwlp_target_mux_sel_o(hwlp_target_mux_sel_o), .hwlp_start_mux_sel_o(hwlp_start_mux_sel_o), .hwlp_cnt_mux_sel_o(hwlp_cnt_mux_sel_o), .debug_mode_i(debug_mode_i), .debug_wfi_no_sleep_i(debug_wfi_no_sleep_i), .ctrl_transfer_insn_in_dec_o(ctrl_transfer_insn_in_dec_o), .ctrl_transfer_insn_in_id_o(ctrl_transfer_insn_in_id_o), .ctrl_transfer_target_mux_sel_o(ctrl_transfer_target_mux_sel_o)) ; 
+    mutated wrapped_i (.deassert_we_i(deassert_we_i), .data_misaligned_i(data_misaligned_i), .mult_multicycle_i(mult_multicycle_i), .illegal_insn_o(illegal_insn_o), .ebrk_insn_o(ebrk_insn_o), .mret_insn_o(mret_insn_o), .uret_insn_o(uret_insn_o), .dret_insn_o(dret_insn_o), .mret_dec_o(mret_dec_o), .uret_dec_o(uret_dec_o), .dret_dec_o(dret_dec_o), .ecall_insn_o(ecall_insn_o), .wfi_o(wfi_o), .fencei_insn_o(fencei_insn_o), .rega_used_o(rega_used_o), 
+                .regb_used_o(regb_used_o), .regc_used_o(regc_used_o), .reg_fp_a_o(reg_fp_a_o), .reg_fp_b_o(reg_fp_b_o), .reg_fp_c_o(reg_fp_c_o), .reg_fp_d_o(reg_fp_d_o), .bmask_a_mux_o(bmask_a_mux_o), .bmask_b_mux_o(bmask_b_mux_o), .alu_bmask_a_mux_sel_o(alu_bmask_a_mux_sel_o), .alu_bmask_b_mux_sel_o(alu_bmask_b_mux_sel_o), .instr_rdata_i(instr_rdata_i), .illegal_c_insn_i(illegal_c_insn_i), .alu_en_o(alu_en_o), .alu_operator_o(alu_operator_o), .alu_op_a_mux_sel_o(alu_op_a_mux_sel_o), 
+                .alu_op_b_mux_sel_o(alu_op_b_mux_sel_o), .alu_op_c_mux_sel_o(alu_op_c_mux_sel_o), .alu_vec_mode_o(alu_vec_mode_o), .scalar_replication_o(scalar_replication_o), .scalar_replication_c_o(scalar_replication_c_o), .imm_a_mux_sel_o(imm_a_mux_sel_o), .imm_b_mux_sel_o(imm_b_mux_sel_o), .regc_mux_o(regc_mux_o), .is_clpx_o(is_clpx_o), .is_subrot_o(is_subrot_o), .mult_operator_o(mult_operator_o), .mult_int_en_o(mult_int_en_o), .mult_dot_en_o(mult_dot_en_o), .mult_imm_mux_o(mult_imm_mux_o), .mult_sel_subword_o(mult_sel_subword_o), 
+                .mult_signed_mode_o(mult_signed_mode_o), .mult_dot_signed_o(mult_dot_signed_o), .frm_i(frm_i), .fpu_dst_fmt_o(fpu_dst_fmt_o), .fpu_src_fmt_o(fpu_src_fmt_o), .fpu_int_fmt_o(fpu_int_fmt_o), .apu_en_o(apu_en_o), .apu_type_o(apu_type_o), .apu_op_o(apu_op_o), .apu_lat_o(apu_lat_o), .apu_flags_src_o(apu_flags_src_o), .fp_rnd_mode_o(fp_rnd_mode_o), .regfile_mem_we_o(regfile_mem_we_o), .regfile_alu_we_o(regfile_alu_we_o), .regfile_alu_we_dec_o(regfile_alu_we_dec_o), 
+                .regfile_alu_waddr_sel_o(regfile_alu_waddr_sel_o), .csr_access_o(csr_access_o), .csr_status_o(csr_status_o), .csr_op_o(csr_op_o), .current_priv_lvl_i(current_priv_lvl_i), .data_req_o(data_req_o), .data_we_o(data_we_o), .prepost_useincr_o(prepost_useincr_o), .data_type_o(data_type_o), .data_sign_extension_o(data_sign_extension_o), .data_reg_offset_o(data_reg_offset_o), .data_load_event_o(data_load_event_o), .atop_o(atop_o), .hwlp_we_o(hwlp_we_o), .hwlp_target_mux_sel_o(hwlp_target_mux_sel_o), 
+                .hwlp_start_mux_sel_o(hwlp_start_mux_sel_o), .hwlp_cnt_mux_sel_o(hwlp_cnt_mux_sel_o), .debug_mode_i(debug_mode_i), .debug_wfi_no_sleep_i(debug_wfi_no_sleep_i), .ctrl_transfer_insn_in_dec_o(ctrl_transfer_insn_in_dec_o), .ctrl_transfer_insn_in_id_o(ctrl_transfer_insn_in_id_o), .ctrl_transfer_target_mux_sel_o(ctrl_transfer_target_mux_sel_o), .mcounteren_i(mcounteren_i)) ; 
 
 // cv32e40p_decoder
 endmodule
