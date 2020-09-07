@@ -5,10 +5,10 @@ tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 [setup]
 bash setup_sim.sh
 bash setup_dsim.sh
-yosys mktemplates.ys
+#yosys mktemplates.ys
 
 [script]
-yosys read_sources.ys
+script read_sources.ys
 hierarchy -top cv32e40p_decoder -chparam WAPUTYPE 1
 prep
 
