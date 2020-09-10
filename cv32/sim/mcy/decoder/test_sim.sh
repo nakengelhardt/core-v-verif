@@ -3,6 +3,8 @@
 exec 2>&1
 set -ex
 
+source ../../params.sh
+
 # create yosys script for exporting mutation
 {
 	echo "read_ilang ../../database/design.il"
@@ -17,11 +19,6 @@ set -ex
 
 # export mutated.sv
 yosys -ql mutate.log mutate.ys
-
-# expected phrase
-EXPECT_MSG="ALL TESTS PASSED"
-# expected time the phrase should appear in output
-EXPECT_NUM=1
 
 # locations
 PROJ_ROOT_DIR=$PWD/../../../../../..
@@ -38,17 +35,17 @@ echo "mutated.sv" >> mutated_manifest.flist
 MAKEFLAGS="CV32E40P_MANIFEST=mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR"
 MAKEFILE=../../Makefile
 make -f $MAKEFILE $MAKEFLAGS testbench_verilator
-ln -s ../../database/setup/firmware.hex
 
 # for each mutation (listed in input.txt)
 while read idx mut; do
-	timeout 1m ./testbench_verilator +firmware=firmware.hex --mutidx ${idx} > sim_${idx}.out || true
-
-	if [[ `grep -c "$EXPECT_MSG" sim_${idx}.out` -ne $EXPECT_NUM ]]
-	then
-		echo "${idx} FAIL" >> output.txt
-		continue
-	fi
-
+	for PROG in $CUSTOM_PROGS $PULP_CUSTOM_PROGS ; do
+		ln -fs ../../database/setup/custom-$PROG.hex
+		timeout 1m ./testbench_verilator +firmware=custom-$PROG.hex --mutidx ${idx} > sim_${PROG}_${idx}.out || true
+		if ! grep "EXIT SUCCESS" sim_${PROG}_${idx}.out && ! grep "ALL TESTS PASSED" sim_${PROG}_${idx}.out
+		then
+			echo "${idx} FAIL" >> output.txt
+			continue 2
+		fi
+	done
 	echo "$idx PASS" >> output.txt
 done < input.txt

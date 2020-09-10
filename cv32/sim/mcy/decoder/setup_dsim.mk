@@ -1,3 +1,7 @@
+override PROJ_ROOT_DIR:=$(PWD)/../../../../../..
+override MAKE_PATH:=$(PROJ_ROOT_DIR)/cv32/sim/uvmt_cv32/
+
+
 SUPPORTED_COMMANDS = build-unit-test
 
 include $(PROJ_ROOT_DIR)/cv32/sim/uvmt_cv32/Makefile
@@ -26,4 +30,6 @@ asm-%.hex: $(ASM_DIR)/%.hex
 
 asm-%.elf: $(ASM_DIR)/%.elf
 	cp $< $@
+
+print-%  : ; @echo $* = $($*)
 

@@ -53,13 +53,5 @@ for PROG in $PULP_CUSTOM_PROGS ; do
 	fi
 done
 
-# disabled - currently known to fail
-#ln -s ../../database/setup/firmware.hex
-#ln -s ../../database/setup/firmware.elf
-#make -f $MAKEFILE $MAKEFLAGS dsim-firmware
-#if [[ `grep -c "ERROR" dsim_results/firmware/dsim-firmware.log` -ne 4 ]] ; then
-#	echo "1 FAIL" > output.txt
-#	exit 0
-#fi
 
 echo "1 PASS" > output.txt

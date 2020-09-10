@@ -2,7 +2,7 @@
 
 set -e
 
-PROJ_ROOT_DIR=$PWD/../../../..
+PROJ_ROOT_DIR=`realpath $PWD/../../../..`
 TEST_DIR=$PROJ_ROOT_DIR/cv32/tests/core
 MAKEFLAGS="PROJ_ROOT_DIR=$PROJ_ROOT_DIR"
 MAKEFILE=Makefile
@@ -10,4 +10,4 @@ MAKEFILE=Makefile
 make -f $MAKEFILE $MAKEFLAGS clone
 
 make -f $MAKEFILE $MAKEFLAGS $TEST_DIR/cv32_riscv_tests_firmware/cv32_riscv_tests_firmware.hex
-cp $TEST_DIR/cv32_riscv_tests_firmware/cv32_riscv_tests_firmware.hex database/setup/firmware.hex
+cp $TEST_DIR/cv32_riscv_tests_firmware/cv32_riscv_tests_firmware.hex database/setup/cv32_riscv_tests_firmware.hex

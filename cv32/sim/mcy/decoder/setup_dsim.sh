@@ -4,22 +4,15 @@ set -e
 
 source params.sh
 
-PROJ_ROOT_DIR=$PWD/../../../..
-
 cd database/setup
+ln -f -s ../../setup_dsim.mk Makefile
 
-MAKEFILE=../../setup_dsim.mk
-MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
-MAKEFLAGS="PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH"
-
-make -f $MAKEFILE $MAKEFLAGS corev-dv
-
-make -f $MAKEFILE $MAKEFLAGS firmware.hex firmware.elf
+make corev-dv
 
 for PROG in $CUSTOM_PROGS $PULP_CUSTOM_PROGS ; do
-make -f $MAKEFILE $MAKEFLAGS CUSTOM_PROG=$PROG custom-$PROG.hex custom-$PROG.elf
+make CUSTOM_PROG=$PROG custom-$PROG.hex custom-$PROG.elf
 done
 
 for PROG in $ASM_PROGS ; do
-make -f $MAKEFILE $MAKEFLAGS asm-$PROG.hex asm-$PROG.elf
+make asm-$PROG.hex asm-$PROG.elf
 done
