@@ -17,7 +17,7 @@ dsim-firmware: comp
 	+UVM_TESTNAME=uvmt_cv32_firmware_test_c \
 	+firmware=$(PWD)/firmware.hex +elf_file=$(PWD)/firmware.elf
 
-dsim-custom-%: comp custom-%.hex custom-%.elf
+dsim-custom-%: comp
 	mkdir -p $(DSIM_RESULTS)/custom-$* && cd $(DSIM_RESULTS)/custom-$* && \
 	$(DSIM) -l dsim-custom-$*.log -image $(DSIM_IMAGE) \
 	-work $(DSIM_WORK) $(DSIM_RUN_FLAGS) $(DSIM_DMP_FLAGS) \

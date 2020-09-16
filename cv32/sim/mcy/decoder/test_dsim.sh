@@ -32,10 +32,10 @@ MAKEFILE=../../test_dsim.mk
 MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
 MAKEFLAGS="CV32E40P_MANIFEST=$PWD/mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH CCOV=0"
 for PROG in $CUSTOM_PROGS ; do
-	ln -s ../../database/setup/custom-$PROG.hex
 	ln -s ../../database/setup/custom-$PROG.elf
+	ln -s ../../database/setup/custom-$PROG.hex
 
-	make -f $MAKEFILE $MAKEFLAGS dsim-custom-$PROG
+	make -f $MAKEFILE $MAKEFLAGS USE_ISS=YES dsim-custom-$PROG
 	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
 		echo "1 FAIL" > output.txt
 		exit 0
@@ -43,8 +43,8 @@ for PROG in $CUSTOM_PROGS ; do
 done
 
 for PROG in $PULP_CUSTOM_PROGS ; do
-	ln -s ../../database/setup/custom-$PROG.hex
 	ln -s ../../database/setup/custom-$PROG.elf
+	ln -s ../../database/setup/custom-$PROG.hex
 
 	make -f $MAKEFILE $MAKEFLAGS USE_ISS=NO dsim-custom-$PROG
 	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
@@ -53,5 +53,15 @@ for PROG in $PULP_CUSTOM_PROGS ; do
 	fi
 done
 
+for PROG in $COREV_PROGS ; do
+	ln -s ../../database/setup/custom-$PROG.elf
+	ln -s ../../database/setup/custom-$PROG.hex
+
+	make -f $MAKEFILE $MAKEFLAGS USE_ISS=YES dsim-custom-$PROG
+	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
+		echo "1 FAIL" > output.txt
+		exit 0
+	fi
+done
 
 echo "1 PASS" > output.txt
