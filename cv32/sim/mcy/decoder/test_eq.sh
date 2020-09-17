@@ -9,15 +9,11 @@ set -ex
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
 	echo "pmuxtree" # workaround for possible source of fmgap
-	echo "write_verilog mutated.v"
+	echo "write_verilog mutated.sv"
 } > mutate.ys
 
 yosys -ql mutate.log mutate.ys
 ln -s ../../cv32e40p_decoder_miter.sv ../../test_eq.sby .
-
-which python3
-python3 -c "import sys
-print(sys.path)"
 
 sby -f test_eq.sby
 gawk "{ print 1, \$1; }" test_eq/status >> output.txt

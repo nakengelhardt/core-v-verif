@@ -3,13 +3,10 @@ size 1000
 tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 
 [setup]
-bash setup_sim.sh
 bash setup_dsim.sh
 
 [script]
-verific -work fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
-verific -work cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
-verific -L cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
+script read_sources.ys
 prep -top cv32e40p_alu_div
 pmuxtree
 

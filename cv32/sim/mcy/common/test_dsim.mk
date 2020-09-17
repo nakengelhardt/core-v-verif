@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright 2020 OpenHW Group
 # Copyright 2020 Symbiotic EDA
@@ -17,22 +16,15 @@
 #
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 #
-exec 2>&1
-set -ex
 
-{
-	echo "read_ilang ../../database/design.il"
-	while read -r idx mut; do
-		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
-	done < input.txt
-	echo "pmuxtree" # workaround for possible source of fmgap
-	echo "write_verilog mutated.sv"
-} > mutate.ys
+include $(PROJ_ROOT_DIR)/cv32/sim/uvmt_cv32/Makefile
 
-yosys -ql mutate.log mutate.ys
-ln -s ../../cv32e40p_alu_div_miter.sv ../../test_eq.sby .
-
-sby -f test_eq.sby
-gawk "{ print 1, \$1; }" test_eq/status >> output.txt
-
-exit 0
+dsim-custom-%: comp custom-%.hex custom-%.elf
+	mkdir -p $(DSIM_RESULTS)/custom-$* && cd $(DSIM_RESULTS)/custom-$* && \
+	$(DSIM) -l dsim-custom-$*.log -image $(DSIM_IMAGE) \
+	-work $(DSIM_WORK) $(DSIM_RUN_FLAGS) $(DSIM_DMP_FLAGS) \
+	-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+	-sv_lib $(OVP_MODEL_DPI) \
+	+UVM_TESTNAME=uvmt_cv32_firmware_test_c \
+	+firmware=$(PWD)/custom-$*.hex \
+	+elf_file=$(PWD)/custom-$*.elf

@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright 2020 OpenHW Group
 # Copyright 2020 Symbiotic EDA
@@ -17,22 +16,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 #
-exec 2>&1
-set -ex
 
-{
-	echo "read_ilang ../../database/design.il"
-	while read -r idx mut; do
-		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
-	done < input.txt
-	echo "pmuxtree" # workaround for possible source of fmgap
-	echo "write_verilog mutated.sv"
-} > mutate.ys
-
-yosys -ql mutate.log mutate.ys
-ln -s ../../cv32e40p_alu_div_miter.sv ../../test_eq.sby .
-
-sby -f test_eq.sby
-gawk "{ print 1, \$1; }" test_eq/status >> output.txt
-
-exit 0
+script read_sources.ys
+verific -template wrapper_dpi cv32e40p_alu_div -width 8 -name mutated -out cv32e40p_alu_div_wrapper_dpi.sv
+verific -template wrapper cv32e40p_alu_div -name mutated -out cv32e40p_alu_div_wrapper.sv
+verific -template miter cv32e40p_alu_div -out cv32e40p_alu_div_miter.sv

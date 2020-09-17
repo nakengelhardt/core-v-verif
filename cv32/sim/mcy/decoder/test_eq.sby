@@ -8,11 +8,11 @@ btor btormc
 #smtbmc boolector
 
 [script]
-verific -work fpnew_pkg -sv fpnew_pkg.sv 
+verific -work fpnew_pkg -sv fpnew_pkg.sv
 verific -work cv32e40p_pkg -L fpnew_pkg -sv cv32e40p_pkg.sv
 verific -work cv32e40p_apu_core_pkg -L fpnew_pkg -sv cv32e40p_apu_core_pkg.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -sv cv32e40p_decoder_miter.sv
-verific -sv mutated.v
+verific -sv mutated.sv
 prep -top miter
 fmcombine miter ref_i uut_i
 flatten
@@ -23,5 +23,4 @@ opt -fast
 ../../../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
 ../../../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_apu_core_pkg.sv
 cv32e40p_decoder_miter.sv
-mutated.v
-
+mutated.sv

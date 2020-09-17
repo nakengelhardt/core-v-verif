@@ -1,4 +1,22 @@
 #!/bin/bash
+#
+# Copyright 2020 OpenHW Group
+# Copyright 2020 Symbiotic EDA
+#
+# Licensed under the Solderpad Hardware License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://solderpad.org/licenses/
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+#
 
 exec 2>&1
 set -ex
@@ -17,51 +35,11 @@ set -ex
 # export mutated.sv
 yosys -ql mutate.log mutate.ys
 
-source ../../params.sh
-
-PROJ_ROOT_DIR=$PWD/../../../../../..
+source ../../../common/params.sh
 
 # create modified manifest
 grep -v "cv32e40p_decoder.sv" $PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist > mutated_manifest.flist
 echo "../../cv32e40p_decoder_wrapper.sv" >> mutated_manifest.flist
 echo "$PWD/mutated.sv" >> mutated_manifest.flist
 
-
-export SIMULATOR=dsim
-MAKEFILE=../../test_dsim.mk
-MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
-MAKEFLAGS="CV32E40P_MANIFEST=$PWD/mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH CCOV=0"
-for PROG in $CUSTOM_PROGS ; do
-	ln -s ../../database/setup/custom-$PROG.elf
-	ln -s ../../database/setup/custom-$PROG.hex
-
-	make -f $MAKEFILE $MAKEFLAGS USE_ISS=YES dsim-custom-$PROG
-	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
-		echo "1 FAIL" > output.txt
-		exit 0
-	fi
-done
-
-for PROG in $PULP_CUSTOM_PROGS ; do
-	ln -s ../../database/setup/custom-$PROG.elf
-	ln -s ../../database/setup/custom-$PROG.hex
-
-	make -f $MAKEFILE $MAKEFLAGS USE_ISS=NO dsim-custom-$PROG
-	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
-		echo "1 FAIL" > output.txt
-		exit 0
-	fi
-done
-
-for PROG in $COREV_PROGS ; do
-	ln -s ../../database/setup/custom-$PROG.elf
-	ln -s ../../database/setup/custom-$PROG.hex
-
-	make -f $MAKEFILE $MAKEFLAGS USE_ISS=YES dsim-custom-$PROG
-	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
-		echo "1 FAIL" > output.txt
-		exit 0
-	fi
-done
-
-echo "1 PASS" > output.txt
+source ../../../common/run_dsim.sh
