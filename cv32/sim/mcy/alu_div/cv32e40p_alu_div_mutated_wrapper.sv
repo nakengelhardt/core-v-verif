@@ -1,4 +1,27 @@
+<<<<<<< HEAD:cv32/sim/mcy/alu_div/cv32e40p_alu_div_mutated_wrapper.sv
 module cv32e40p_alu_div
+=======
+//
+// Copyright 2020 OpenHW Group
+// Copyright 2020 Symbiotic EDA
+//
+// Licensed under the Solderpad Hardware License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// https://solderpad.org/licenses/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+//
+
+module riscv_alu_div
+>>>>>>> df2f459c82955d6b9bb5827ead05a6bb3da0dbf6:cv32/sim/mcy/alu_div/riscv_alu_div_mutated_wrapper.sv
   #(
      parameter C_WIDTH     = 32,
      parameter C_LOG_WIDTH = 6
