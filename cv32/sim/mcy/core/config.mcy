@@ -1,0 +1,84 @@
+[options]
+size 10
+tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
+
+[setup]
+#bash ../common/setup_dsim.sh
+
+[script]
+script read_sources.ys
+hierarchy -top cv32e40p_core -chparam WAPUTYPE 1
+prep
+
+
+[files]
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_if_stage.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_cs_registers.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_ff.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_load_store_unit.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_id_stage.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_aligner.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_decoder.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_compressed_decoder.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_fifo.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_buffer.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_hwloop_regs.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_mult.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_test_wrap.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_int_controller.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ex_stage.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ff_one.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_popcnt.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_apu_disp.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_controller.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_obi_interface.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_controller.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_sleep_unit.sv
+../../../../core-v-cores/cv32e40p/rtl/cv32e40p_core.sv
+
+[logic]
+
+if result("test_eq") == "PASS":
+  if rng(100) < 20:
+    tag("PROBE")
+    if result("test_sim") == "FAIL":
+      tag("FMGAP")
+      return
+    if result("test_dsim") == "FAIL":
+      tag("FMGAP")
+      return
+  tag("NOCHANGE")
+  return
+
+if result("test_sim") == "FAIL":
+  tag("COVERED")
+  tag("VERI")
+  return
+if result("test_dsim") == "FAIL":
+  tag("COVERED")
+  tag("UVM")
+  return
+
+tag("UNCOVERED")
+
+
+[report]
+if tags("FMGAP"):
+    print("Found %d mutations exposing a formal gap!" % tags("FMGAP"))
+if tags("COVERED")+tags("UNCOVERED"):
+    print("Coverage: %.2f%%" % (100.0*tags("COVERED")/(tags("COVERED")+tags("UNCOVERED"))))
+
+[test test_sim]
+maxbatchsize 10
+expect PASS FAIL
+run bash $PRJDIR/test_sim.sh
+
+[test test_dsim]
+expect PASS FAIL
+run bash $PRJDIR/test_dsim.sh
+
+[test test_eq]
+expect PASS FAIL
+run bash $PRJDIR/test_eq.sh

@@ -1,4 +1,3 @@
-#
 # Copyright 2020 OpenHW Group
 # Copyright 2020 Symbiotic EDA
 #
@@ -15,8 +14,8 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
-#
 
+verific -set-ignore VERI-2418
 verific -work fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
 verific -work cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv

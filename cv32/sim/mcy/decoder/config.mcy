@@ -3,7 +3,6 @@ size 100
 tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 
 [setup]
-#bash setup_sim.sh
 bash setup_dsim.sh
 #yosys mktemplates.ys
 

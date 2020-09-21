@@ -1,0 +1,48 @@
+# Copyright 2020 OpenHW Group
+# Copyright 2020 Symbiotic EDA
+#
+# Licensed under the Solderpad Hardware License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# https://solderpad.org/licenses/
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+
+verific -set-ignore VERI-2418
+verific -work fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
+verific -work cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
+verific -work cv32e40p_apu_core_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_apu_core_pkg.sv
+verific -work cv32e40p_tracer_pkg -L cv32e40p_pkg -L fpnew_pkg -sv ../../../../core-v-cores/cv32e40p/bhv/include/cv32e40p_tracer_pkg.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_if_stage.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_cs_registers.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_ff.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_load_store_unit.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_id_stage.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_aligner.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_decoder.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_compressed_decoder.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_fifo.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_buffer.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_hwloop_regs.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_mult.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_test_wrap.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_int_controller.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ex_stage.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ff_one.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_popcnt.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_apu_disp.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_controller.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_obi_interface.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_controller.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/bhv/cv32e40p_sim_clock_gate.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_sleep_unit.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_core.sv
