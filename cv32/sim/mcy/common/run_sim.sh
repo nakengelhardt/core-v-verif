@@ -27,7 +27,7 @@ make -f $MAKEFILE $MAKEFLAGS testbench_verilator
 while read idx mut; do
 	for PROG in $CUSTOM_PROGS $PULP_CUSTOM_PROGS $COREV_PROGS; do
 		ln -fs ../../database/setup/custom-$PROG.hex
-		timeout 1m ./testbench_verilator +firmware=custom-$PROG.hex --mutidx ${idx} > sim_${PROG}_${idx}.out || true
+		timeout 1m ./testbench_verilator +firmware=custom-$PROG.hex --mutidx ${idx} --mutprobe "${mutprobe}" > sim_${PROG}_${idx}.out || true
 		if ! grep "EXIT SUCCESS" sim_${PROG}_${idx}.out && ! grep "ALL TESTS PASSED" sim_${PROG}_${idx}.out
 		then
 			echo "${idx} FAIL" >> output.txt

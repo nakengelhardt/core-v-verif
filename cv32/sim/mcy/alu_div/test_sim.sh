@@ -29,7 +29,7 @@ set -ex
 		# add multiple mutations to module, selectable with 'mutsel' input
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
-	echo "opt_rmdff" # workaround for verilator not supporting posedge 1'b1
+	echo 'simplemap t:$dffsr t:$dffsre ; opt_dff' # workaround for verilator not supporting posedge 1'b1
 	echo "rename cv32e40p_alu_div mutated"
 	echo "write_verilog -attr2comment mutated.sv"
 } > mutate.ys
@@ -45,4 +45,5 @@ echo "../../cv32e40p_alu_div_wrapper_dpi.sv" >> mutated_manifest.flist
 echo "mutated.sv" >> mutated_manifest.flist
 
 # run testbench with mutated manifest
+mutprobe="TOP.tb_top_verilator.cv32e40p_tb_wrapper_i.cv32e40p_core_i.ex_stage_i.alu_i.int_div.alu_div_i"
 source ../../../common/run_sim.sh

@@ -23,6 +23,7 @@ int main(int argc, char **argv, char **env)
 
 #ifdef MCY
     int mutidx = 0;
+    std::string mutprobe;
     for (int i = 1; i < argc; i++)
     {
       if (!strcmp(argv[i], "--mutidx") && i+1 < argc)
@@ -31,7 +32,13 @@ int main(int argc, char **argv, char **env)
         std::string s(argv[i]);
         mutidx = std::stoi(s);
       }
+      if (!strcmp(argv[i], "--mutprobe") && i+1 < argc)
+      {
+        i++;
+        mutprobe = std::string(argv[i]);
+      }
     }
+    std::cout << "mutprobe=\"" << mutprobe << "\"\n";
 #endif
 
     Verilated::commandArgs(argc, argv);
@@ -55,10 +62,7 @@ int main(int argc, char **argv, char **env)
     dump_memory();
 
 #ifdef MCY
-    svSetScope(svGetScopeFromName(
-     "TOP.tb_top_verilator.cv32e40p_tb_wrapper_i.cv32e40p_core_i.id_stage_i.decoder_i"
-//    "TOP.tb_top_verilator.cv32e40p_tb_wrapper_i.riscv_core_i.ex_stage_i.alu_i.int_div.div_i"
-));
+    svSetScope(svGetScopeFromName(mutprobe.c_str()));
     svLogicVecVal idx = {0};
     idx.aval = mutidx;
     set_mutidx(&idx);

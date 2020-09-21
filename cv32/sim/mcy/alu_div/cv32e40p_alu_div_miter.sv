@@ -43,7 +43,7 @@ module miter #(parameter C_WIDTH = 32, parameter C_LOG_WIDTH = 6) (
     cv32e40p_alu_div uut_i (.mutsel(1'b1), .Clk_CI(Clk_CI), .Rst_RBI(Rst_RBI), .OpA_DI(OpA_DI), .OpB_DI(OpB_DI), .OpBShift_DI(OpBShift_DI), .OpBIsZero_SI(OpBIsZero_SI), .OpBSign_SI(OpBSign_SI), .OpCode_SI(OpCode_SI), .InVld_SI(InVld_SI), .OutRdy_SI(OutRdy_SI), .OutVld_SO(uut_OutVld_SO), .Res_DO(uut_Res_DO)) ;
 
     logic init_cycle = 1'b1;
-    always @ (posedge clk) begin
+    always @ (posedge Clk_CI) begin
       init_cycle = 1'b0;
     end
     always @(*) begin

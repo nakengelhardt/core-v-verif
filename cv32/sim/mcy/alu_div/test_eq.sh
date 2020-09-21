@@ -26,6 +26,7 @@ set -ex
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
 	echo "pmuxtree" # workaround for possible source of fmgap
+	echo "opt_dff"
 	echo "write_verilog mutated.sv"
 } > mutate.ys
 

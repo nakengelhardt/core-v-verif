@@ -28,7 +28,7 @@ set -ex
 	while read -r idx mut; do
 		echo "mutate ${mut#* }"
 	done < input.txt
-	echo "opt_rmdff" # workaround for verilator not supporting posedge 1'b1
+	echo "opt_dff" # workaround for verilator not supporting posedge 1'b1
 	echo "rename cv32e40p_alu_div mutated"
 	echo "write_verilog -attr2comment mutated.sv"
 } > mutate.ys

@@ -3,7 +3,7 @@ size 1000
 tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 
 [setup]
-bash setup_dsim.sh
+bash ../common/setup_dsim.sh
 
 [script]
 script read_sources.ys
