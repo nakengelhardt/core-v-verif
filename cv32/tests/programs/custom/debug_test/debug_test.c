@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
       .fields.pulse_mode       = 1, //PULSE Mode
       .fields.rand_pulse_width = 0,
       .fields.pulse_width      = 5,// FIXME: BUG: one clock pulse cause core to lock up
-      .fields.rand_start_delay = 1,
+      .fields.rand_start_delay = 0,
       .fields.start_delay      = 200
     };
     glb_expect_debug_entry = 1;
@@ -437,6 +437,7 @@ int main(int argc, char *argv[])
     check_debug_exception_status(112,glb_hart_status);
     //FIXME TBD BUG : need to update test to check actual csrs not modified.
 
+/* IMPERAS _ TODO undefined behavior of <mus>ret
     printf("------------------------\n");
     printf(" Test13: check mret during debug launches debugger exception and no csr modified\n");
     glb_hart_status = 13;
@@ -449,6 +450,7 @@ int main(int argc, char *argv[])
     check_debug_status(113,glb_hart_status);
     check_debug_exception_status(113,glb_hart_status);
     //FIXME TBD BUG : need to update test to check actual csrs not modified.
+*/
 
     printf("------------------------\n");
     printf(" Test14: Check exception ebreak enters debug mode\n");
@@ -527,6 +529,7 @@ int main(int argc, char *argv[])
     }
     check_debug_status(121, glb_hart_status);
 
+
     printf("------------------------\n");
     printf("Test 18: Single stepping\n");
     glb_hart_status = 18;
@@ -539,6 +542,7 @@ int main(int argc, char *argv[])
     check_debug_status(118, glb_hart_status);
 
     printf("Stepped %d times\n", glb_step_count);    
+
 
     printf("------------------------\n");
     printf("Test 19: irq in debug\n");
@@ -570,7 +574,7 @@ int main(int argc, char *argv[])
     DEBUG_REQ_CONTROL_REG = debug_req_control.bits;
     // 170 halts on first instuction in interrupt handler
     // 175 gives same timing for interrupt and debug_req_i
-    mm_ram_assert_irq(0x40000000, 175);
+    mm_ram_assert_irq(0x40000000, 175+20);
 
     while(glb_debug_status != glb_hart_status){
         printf("Wait for Debugger\n");
