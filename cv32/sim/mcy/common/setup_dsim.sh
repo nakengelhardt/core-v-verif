@@ -33,6 +33,12 @@ make gen_corev-dv mcy TEST=corev_rand_instr_test GEN_START_INDEX=0 RUN_INDEX=0 S
 make gen_corev-dv mcy TEST=corev_rand_instr_test GEN_START_INDEX=1 RUN_INDEX=1 SIMULATOR=dsim USE_ISS=YES
 make gen_corev-dv mcy TEST=corev_jump_stress_test GEN_START_INDEX=0 RUN_INDEX=0 SIMULATOR=dsim USE_ISS=YES
 make gen_corev-dv mcy TEST=corev_jump_stress_test GEN_START_INDEX=1 RUN_INDEX=1 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt GEN_START_INDEX=0 RUN_INDEX=0 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt GEN_START_INDEX=1 RUN_INDEX=1 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt GEN_START_INDEX=2 RUN_INDEX=2 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt_wfi GEN_START_INDEX=0 RUN_INDEX=0 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt_wfi GEN_START_INDEX=1 RUN_INDEX=1 SIMULATOR=dsim USE_ISS=YES
+make gen_corev-dv mcy TEST=corev_rand_interrupt_wfi GEN_START_INDEX=2 RUN_INDEX=2 SIMULATOR=dsim USE_ISS=YES
 
 make mcy TEST=riscv_arithmetic_basic_test RUN_INDEX=0
 

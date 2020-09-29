@@ -22,20 +22,21 @@ if result("test_sim") == "FAIL":
     if result("test_eq") == "PASS":
       tag("FMGAP")
   return
-elif result("test_dsim") == "FAIL":
-  tag("COVERED")
-  tag("UVM")
+
+if result("test_eq") == "PASS":
+  tag("NOCHANGE")
   if rng(100) < 20:
     tag("PROBE")
-    if result("test_eq") == "PASS":
+    if result("test_dsim") == "PASS":
       tag("FMGAP")
   return
 
-if result("test_eq") == "FAIL":
-  tag("UNCOVERED")
+if result("test_dsim") == "FAIL":
+  tag("COVERED")
+  tag("UVM")
   return
 
-tag("NOCHANGE")
+tag("UNCOVERED")
 
 [report]
 if tags("FMGAP"):
