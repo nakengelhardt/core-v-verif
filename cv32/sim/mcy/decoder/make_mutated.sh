@@ -27,6 +27,7 @@ while read -r mut; do
 		echo "read_ilang database/design.il"
 		echo "${mut}"
 		echo "pmuxtree" # workaround for possible source of fmgap
+		echo "rename cv32e40p_decoder mutated"
 		echo "write_verilog mutated/mutated_${idx}.v"
 	} > mutate.ys
 	yosys -ql mutate.log mutate.ys
