@@ -101,6 +101,9 @@ module cv32e40p_core
     mutated wrapped_i (.mutsel(mutsel), .clk_i(clk_i), .rst_ni(rst_ni), .pulp_clock_en_i(pulp_clock_en_i), .scan_cg_en_i(scan_cg_en_i), .boot_addr_i(boot_addr_i), .mtvec_addr_i(mtvec_addr_i), .dm_halt_addr_i(dm_halt_addr_i), .hart_id_i(hart_id_i), .dm_exception_addr_i(dm_exception_addr_i), .instr_req_o(instr_req_o), .instr_gnt_i(instr_gnt_i), .instr_rvalid_i(instr_rvalid_i), .instr_addr_o(instr_addr_o), .instr_rdata_i(instr_rdata_i), 
                 .data_req_o(data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(data_we_o), .data_be_o(data_be_o), .data_addr_o(data_addr_o), .data_wdata_o(data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(apu_master_req_o), .apu_master_ready_o(apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i), .apu_master_operands_o(apu_master_operands_o), .apu_master_op_o(apu_master_op_o), .apu_master_type_o(apu_master_type_o), .apu_master_flags_o(apu_master_flags_o), 
                 .apu_master_valid_i(apu_master_valid_i), .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_ack_o(irq_ack_o), .irq_id_o(irq_id_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(core_sleep_o)) ; 
+
+  logic [31:0]       pc_id;
+  assign pc_id = wrapped_i.pc_id;
 endmodule
 
 

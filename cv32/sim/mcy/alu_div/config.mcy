@@ -27,7 +27,7 @@ if result("test_eq") == "PASS":
   tag("NOCHANGE")
   if rng(100) < 20:
     tag("PROBE")
-    if result("test_dsim") == "PASS":
+    if result("test_dsim") == "FAIL":
       tag("FMGAP")
   return
 

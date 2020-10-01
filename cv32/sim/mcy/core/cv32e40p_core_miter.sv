@@ -105,10 +105,18 @@ module miter
     if ((NUM_MHPMCOUNTERS != 1)) 
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with NUM_MHPMCOUNTERS = 1 but %0d was passed",NUM_MHPMCOUNTERS) ;
     cv32e40p_core ref_i (.mutsel(8'b0), .clk_i(clk_i), .rst_ni(rst_ni), .pulp_clock_en_i(pulp_clock_en_i), .scan_cg_en_i(scan_cg_en_i), .boot_addr_i(boot_addr_i), .mtvec_addr_i(mtvec_addr_i), .dm_halt_addr_i(dm_halt_addr_i), .hart_id_i(hart_id_i), .dm_exception_addr_i(dm_exception_addr_i), .instr_req_o(ref_instr_req_o), .instr_gnt_i(instr_gnt_i), .instr_rvalid_i(instr_rvalid_i), .instr_addr_o(ref_instr_addr_o), .instr_rdata_i(instr_rdata_i), 
-                .data_req_o(ref_data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(ref_data_we_o), .data_be_o(ref_data_be_o), .data_addr_o(ref_data_addr_o), .data_wdata_o(ref_data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(ref_apu_master_req_o), .apu_master_ready_o(ref_apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i), .apu_master_operands_o(ref_apu_master_operands_o), .apu_master_op_o(ref_apu_master_op_o), .apu_master_type_o(ref_apu_master_type_o), .apu_master_flags_o(ref_apu_master_flags_o), 
+                .data_req_o(ref_data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(ref_data_we_o), .data_be_o(ref_data_be_o), .data_addr_o(ref_data_addr_o), .data_wdata_o(ref_data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(ref_apu_master_req_o), .apu_master_ready_o(ref_apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i),
+ .\apu_master_operands_o[0] (ref_apu_master_operands_o[0]),
+ .\apu_master_operands_o[1] (ref_apu_master_operands_o[1]),
+ .\apu_master_operands_o[2] (ref_apu_master_operands_o[2]),
+ .apu_master_op_o(ref_apu_master_op_o), .apu_master_type_o(ref_apu_master_type_o), .apu_master_flags_o(ref_apu_master_flags_o), 
                 .apu_master_valid_i(apu_master_valid_i), .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_ack_o(ref_irq_ack_o), .irq_id_o(ref_irq_id_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(ref_core_sleep_o)) ; 
     cv32e40p_core uut_i (.mutsel(8'b01), .clk_i(clk_i), .rst_ni(rst_ni), .pulp_clock_en_i(pulp_clock_en_i), .scan_cg_en_i(scan_cg_en_i), .boot_addr_i(boot_addr_i), .mtvec_addr_i(mtvec_addr_i), .dm_halt_addr_i(dm_halt_addr_i), .hart_id_i(hart_id_i), .dm_exception_addr_i(dm_exception_addr_i), .instr_req_o(uut_instr_req_o), .instr_gnt_i(instr_gnt_i), .instr_rvalid_i(instr_rvalid_i), .instr_addr_o(uut_instr_addr_o), .instr_rdata_i(instr_rdata_i), 
-                .data_req_o(uut_data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(uut_data_we_o), .data_be_o(uut_data_be_o), .data_addr_o(uut_data_addr_o), .data_wdata_o(uut_data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(uut_apu_master_req_o), .apu_master_ready_o(uut_apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i), .apu_master_operands_o(uut_apu_master_operands_o), .apu_master_op_o(uut_apu_master_op_o), .apu_master_type_o(uut_apu_master_type_o), .apu_master_flags_o(uut_apu_master_flags_o), 
+                .data_req_o(uut_data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(uut_data_we_o), .data_be_o(uut_data_be_o), .data_addr_o(uut_data_addr_o), .data_wdata_o(uut_data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(uut_apu_master_req_o), .apu_master_ready_o(uut_apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i),
+ .\apu_master_operands_o[0] (uut_apu_master_operands_o[0]),
+ .\apu_master_operands_o[1] (uut_apu_master_operands_o[1]),
+ .\apu_master_operands_o[2] (uut_apu_master_operands_o[2]),
+ .apu_master_op_o(uut_apu_master_op_o), .apu_master_type_o(uut_apu_master_type_o), .apu_master_flags_o(uut_apu_master_flags_o), 
                 .apu_master_valid_i(apu_master_valid_i), .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_ack_o(uut_irq_ack_o), .irq_id_o(uut_irq_id_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(uut_core_sleep_o)) ; 
     always
         @(*)
@@ -122,7 +130,7 @@ module miter
             assert ((ref_data_wdata_o == uut_data_wdata_o)) ;
             assert ((ref_apu_master_req_o == uut_apu_master_req_o)) ;
             assert ((ref_apu_master_ready_o == uut_apu_master_ready_o)) ;
-            assert ((ref_apu_master_operands_o == uut_apu_master_operands_o)) ;
+            assert ((ref_apu_master_operands_o[0] == uut_apu_master_operands_o[0])) ;
             assert ((ref_apu_master_op_o == uut_apu_master_op_o)) ;
             assert ((ref_apu_master_type_o == uut_apu_master_type_o)) ;
             assert ((ref_apu_master_flags_o == uut_apu_master_flags_o)) ;

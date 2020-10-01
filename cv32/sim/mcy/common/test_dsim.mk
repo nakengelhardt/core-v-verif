@@ -28,3 +28,19 @@ dsim-custom-%: comp custom-%.hex custom-%.elf
 	+UVM_TESTNAME=uvmt_cv32_firmware_test_c \
 	+firmware=$(PWD)/custom-$*.hex \
 	+elf_file=$(PWD)/custom-$*.elf
+
+dsim-test-%: $(DSIM_SIM_PREREQ)  custom-%.hex gen_ovpsim_ic
+	mkdir -p $(DSIM_RESULTS)/custom-$* && \
+	cd $(DSIM_RESULTS)/custom-$* && \
+	$(DSIM) \
+	-l dsim-custom-$*.log \
+	-image $(DSIM_IMAGE) \
+	-work $(DSIM_WORK) \
+	$(DSIM_RUN_FLAGS) \
+	$(DSIM_DMP_FLAGS) \
+	+gen_irq_noise \
+	-sv_lib $(UVM_HOME)/src/dpi/libuvm_dpi.so \
+	-sv_lib $(OVP_MODEL_DPI) \
+	+UVM_TESTNAME=uvmt_cv32_firmware_test_c \
+	+firmware=$(PWD)/custom-$*.hex \
+	+elf_file=$(PWD)/custom-$*.elf

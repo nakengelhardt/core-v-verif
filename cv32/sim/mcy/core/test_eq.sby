@@ -14,10 +14,14 @@ verific -work cv32e40p_apu_core_pkg -L fpnew_pkg -sv cv32e40p_apu_core_pkg.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -sv cv32e40p_core_miter.sv
 verific -sv mutated.sv
 prep -top miter
+simplemap t:$or
+opt -fine
 fmcombine miter ref_i uut_i
-flatten
 opt -fast
 
 [files]
+../../../../../../core-v-cores/cv32e40p/rtl/fpnew/src/fpnew_pkg.sv
+../../../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_pkg.sv
+../../../../../../core-v-cores/cv32e40p/rtl/include/cv32e40p_apu_core_pkg.sv
 cv32e40p_core_miter.sv
 mutated.sv
