@@ -32,7 +32,6 @@ verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_buffer.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_hwloop_regs.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_mult.sv
-verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_test_wrap.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_int_controller.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ex_stage.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv
@@ -43,6 +42,6 @@ verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_controller.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_obi_interface.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_controller.sv
-verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/bhv/cv32e40p_sim_clock_gate.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_sleep_unit.sv
 verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_core.sv
+verific -L cv32e40p_pkg -L fpnew_pkg -L cv32e40p_apu_core_pkg -L cv32e40p_tracer_pkg -sv ../../../../core-v-cores/cv32e40p/bhv/cv32e40p_sim_clock_gate.sv
