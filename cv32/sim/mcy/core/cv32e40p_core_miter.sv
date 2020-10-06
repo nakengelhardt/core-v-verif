@@ -118,9 +118,18 @@ module miter
  .\apu_master_operands_o[2] (uut_apu_master_operands_o[2]),
  .apu_master_op_o(uut_apu_master_op_o), .apu_master_type_o(uut_apu_master_type_o), .apu_master_flags_o(uut_apu_master_flags_o), 
                 .apu_master_valid_i(apu_master_valid_i), .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_ack_o(uut_irq_ack_o), .irq_id_o(uut_irq_id_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(uut_core_sleep_o)) ; 
+
+logic init_cycle = 1'b1;
+always @ (posedge clk_i) begin
+	init_cycle = 1'b0;
+end
+
+
     always
         @(*)
         begin
+		if (init_cycle) assume (!rst_ni);
+	if (rst_ni) begin
             assert ((ref_instr_req_o == uut_instr_req_o)) ;
             assert ((ref_instr_addr_o == uut_instr_addr_o)) ;
             assert ((ref_data_req_o == uut_data_req_o)) ;
@@ -131,6 +140,8 @@ module miter
             assert ((ref_apu_master_req_o == uut_apu_master_req_o)) ;
             assert ((ref_apu_master_ready_o == uut_apu_master_ready_o)) ;
             assert ((ref_apu_master_operands_o[0] == uut_apu_master_operands_o[0])) ;
+            assert ((ref_apu_master_operands_o[1] == uut_apu_master_operands_o[1])) ;
+            assert ((ref_apu_master_operands_o[2] == uut_apu_master_operands_o[2])) ;
             assert ((ref_apu_master_op_o == uut_apu_master_op_o)) ;
             assert ((ref_apu_master_type_o == uut_apu_master_type_o)) ;
             assert ((ref_apu_master_flags_o == uut_apu_master_flags_o)) ;
@@ -138,6 +149,7 @@ module miter
             assert ((ref_irq_id_o == uut_irq_id_o)) ;
             assert ((ref_core_sleep_o == uut_core_sleep_o)) ;
         end
+	end
 endmodule
 
 

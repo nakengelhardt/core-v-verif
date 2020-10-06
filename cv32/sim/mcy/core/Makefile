@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Copyright 2020 OpenHW Group
 # Copyright 2020 Symbiotic EDA
@@ -18,20 +17,11 @@
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
 #
 
-export SIMULATOR=dsim
-MAKE_PATH=$PROJ_ROOT_DIR/cv32/sim/uvmt_cv32/
-MAKEFILE=../../../common/test_dsim.mk
-MAKEFLAGS="CV32E40P_MANIFEST=$PWD/mutated_manifest.flist PROJ_ROOT_DIR=$PROJ_ROOT_DIR MAKE_PATH=$MAKE_PATH CCOV=0"
+VERI_CFLAGS += -DMCY
+VERI_COMPILE_FLAGS += -Wno-MULTIDRIVEN
 
-for PROG in $CUSTOM_PROGS $COREV_PROGS ; do
-	ln -fs ../../database/setup/custom-$PROG.elf
-	ln -fs ../../database/setup/custom-$PROG.hex
+include $(PROJ_ROOT_DIR)/cv32/sim/core/Makefile
 
-	make -f $MAKEFILE $MAKEFLAGS USE_ISS=YES dsim-custom-$PROG
-	if ! grep "SIMULATION PASSED" dsim_results/custom-$PROG/dsim-custom-$PROG.log ; then
-		echo "1 FAIL" > output.txt
-		exit 0
-	fi
-done
+.PHONY: clone
+clone: $(CV32E40P_PKG)
 
-echo "1 PASS" > output.txt

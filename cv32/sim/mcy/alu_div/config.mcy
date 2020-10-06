@@ -36,6 +36,16 @@ if result("test_dsim") == "FAIL":
   tag("UVM")
   return
 
+#if result("test_pulp") == "FAIL":
+#  tag("COVERED")
+#  tag("UVM")
+#  return
+
+if result("test_int") == "FAIL":
+  tag("COVERED")
+  tag("UVM")
+  return
+
 tag("UNCOVERED")
 
 [report]
@@ -52,6 +62,14 @@ run bash $PRJDIR/test_sim.sh
 [test test_dsim]
 expect PASS FAIL
 run bash $PRJDIR/test_dsim.sh
+
+[test test_int]
+expect PASS FAIL
+run bash $PRJDIR/test_int.sh
+
+[test test_pulp]
+expect PASS FAIL
+run bash $PRJDIR/test_pulp.sh
 
 [test test_eq]
 expect PASS FAIL

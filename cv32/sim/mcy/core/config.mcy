@@ -9,6 +9,7 @@ tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 script read_sources.ys
 hierarchy -top cv32e40p_core -chparam WAPUTYPE 1
 prep
+simplemap cv32e40p_ff_one/t:$or
 
 
 [files]
@@ -24,7 +25,6 @@ prep
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_prefetch_buffer.sv
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_hwloop_regs.sv
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_mult.sv
-../../../../core-v-cores/cv32e40p/rtl/cv32e40p_register_file_test_wrap.sv
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_int_controller.sv
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_ex_stage.sv
 ../../../../core-v-cores/cv32e40p/rtl/cv32e40p_alu_div.sv

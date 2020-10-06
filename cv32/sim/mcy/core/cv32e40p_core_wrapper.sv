@@ -29,8 +29,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 module cv32e40p_core 
     import cv32e40p_apu_core_pkg:: * ;
-#(parameter PULP_XPULP = 1, parameter PULP_CLUSTER = 0, parameter FPU = 0, parameter PULP_ZFINX = 0, parameter NUM_MHPMCOUNTERS = 1) (
-    // PULP ISA Extension (incl. custom CSRs and hardware loop, excl. p.elw) !!! HARDWARE LOOP IS NOT OPERATIONAL YET !!!
+#(parameter PULP_XPULP = 0, parameter PULP_CLUSTER = 0, parameter FPU = 0, parameter PULP_ZFINX = 0, parameter NUM_MHPMCOUNTERS = 1) (
+    // PULP ISA Extension (incl. custom CSRs and hardware loop, excl. p.elw)
     // PULP Cluster interface (incl. p.elw)
     // Floating Point Unit (interfaced via APU interface)
     // Float-in-General Purpose registers
@@ -83,8 +83,8 @@ module cv32e40p_core
     // CPU Control Signals
     input logic fetch_enable_i, 
     output logic core_sleep_o) ;
-    if ((PULP_XPULP != 1)) 
-        $error ("Changing parameters for mutated modules not supported: mutated module was generated with PULP_XPULP = 1 but %0d was passed",PULP_XPULP) ;
+    if ((PULP_XPULP != 0)) 
+        $error ("Changing parameters for mutated modules not supported: mutated module was generated with PULP_XPULP = 0 but %0d was passed",PULP_XPULP) ;
     if ((PULP_CLUSTER != 0)) 
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with PULP_CLUSTER = 0 but %0d was passed",PULP_CLUSTER) ;
     if ((FPU != 0)) 
@@ -93,9 +93,9 @@ module cv32e40p_core
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with PULP_ZFINX = 0 but %0d was passed",PULP_ZFINX) ;
     if ((NUM_MHPMCOUNTERS != 1)) 
         $error ("Changing parameters for mutated modules not supported: mutated module was generated with NUM_MHPMCOUNTERS = 1 but %0d was passed",NUM_MHPMCOUNTERS) ;
-    mutated wrapped_i (.clk_i(clk_i), .rst_ni(rst_ni), .pulp_clock_en_i(pulp_clock_en_i), .scan_cg_en_i(scan_cg_en_i), .boot_addr_i(boot_addr_i), .mtvec_addr_i(mtvec_addr_i), .dm_halt_addr_i(dm_halt_addr_i), .hart_id_i(hart_id_i), .dm_exception_addr_i(dm_exception_addr_i), .instr_req_o(instr_req_o), .instr_gnt_i(instr_gnt_i), .instr_rvalid_i(instr_rvalid_i), .instr_addr_o(instr_addr_o), .instr_rdata_i(instr_rdata_i), .data_req_o(data_req_o), 
-                .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(data_we_o), .data_be_o(data_be_o), .data_addr_o(data_addr_o), .data_wdata_o(data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_req_o(apu_master_req_o), .apu_master_ready_o(apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i), .apu_master_operands_o(apu_master_operands_o), .apu_master_op_o(apu_master_op_o), .apu_master_type_o(apu_master_type_o), .apu_master_flags_o(apu_master_flags_o), .apu_master_valid_i(apu_master_valid_i), 
-                .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_ack_o(irq_ack_o), .irq_id_o(irq_id_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(core_sleep_o)) ; 
+    mutated wrapped_i (.clk_i(clk_i), .rst_ni(rst_ni), .pulp_clock_en_i(pulp_clock_en_i), .scan_cg_en_i(scan_cg_en_i), .instr_req_o(instr_req_o), .instr_gnt_i(instr_gnt_i), .instr_rvalid_i(instr_rvalid_i), .data_req_o(data_req_o), .data_gnt_i(data_gnt_i), .data_rvalid_i(data_rvalid_i), .data_we_o(data_we_o), .apu_master_req_o(apu_master_req_o), .apu_master_ready_o(apu_master_ready_o), .apu_master_gnt_i(apu_master_gnt_i), .apu_master_valid_i(apu_master_valid_i), 
+                .irq_ack_o(irq_ack_o), .debug_req_i(debug_req_i), .fetch_enable_i(fetch_enable_i), .core_sleep_o(core_sleep_o), .dm_halt_addr_i(dm_halt_addr_i), .hart_id_i(hart_id_i), .dm_exception_addr_i(dm_exception_addr_i), .instr_addr_o(instr_addr_o), .instr_rdata_i(instr_rdata_i), .data_be_o(data_be_o), .data_addr_o(data_addr_o), .data_wdata_o(data_wdata_o), .data_rdata_i(data_rdata_i), .apu_master_op_o(apu_master_op_o), .\apu_master_operands_o[2] (apu_master_operands_o[2]), 
+                .apu_master_type_o(apu_master_type_o), .apu_master_flags_o(apu_master_flags_o), .apu_master_result_i(apu_master_result_i), .apu_master_flags_i(apu_master_flags_i), .irq_i(irq_i), .irq_id_o(irq_id_o), .boot_addr_i(boot_addr_i), .mtvec_addr_i(mtvec_addr_i), .\apu_master_operands_o[1] (apu_master_operands_o[1]), .\apu_master_operands_o[0] (apu_master_operands_o[0])) ; 
 endmodule
 
 

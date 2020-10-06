@@ -27,7 +27,7 @@ set -ex
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
 	echo "opt_dff" # workaround for verilator not supporting posedge 1'b1
-	echo "rename cv32e40p_decoder mutated"
+	echo "rename cv32e40p_core mutated"
 	echo "write_verilog -attr2comment mutated.sv"
 } > mutate.ys
 
@@ -36,12 +36,7 @@ yosys -ql mutate.log mutate.ys
 
 source ../../../common/params.sh
 
-# create modified manifest
-ORIG_MANIFEST="$PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist"
-grep -v "cv32e40p_decoder.sv" $ORIG_MANIFEST > mutated_manifest.flist
-echo "../../cv32e40p_decoder_wrapper_dpi.sv" >> mutated_manifest.flist
-echo "mutated.sv" >> mutated_manifest.flist
+# copy mutated manifest - core contains too many files to make grep-excluding them useful
+ln -s ../../mutated_manifest.flist
 
-
-mutprobe='TOP.tb_top_verilator.cv32e40p_tb_wrapper_i.cv32e40p_core_i.id_stage_i.decoder_i'
 source ../../../common/run_sim.sh

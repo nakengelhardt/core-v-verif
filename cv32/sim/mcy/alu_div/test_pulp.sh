@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 # Copyright 2020 OpenHW Group
 # Copyright 2020 Symbiotic EDA
 #
@@ -15,6 +16,7 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: Apache-2.0 WITH SHL-2.0
+#
 
 exec 2>&1
 set -ex
@@ -23,11 +25,10 @@ set -ex
 {
 	echo "read_ilang ../../database/design.il"
 	while read -r idx mut; do
-		# add multiple mutations to module, selectable with 'mutsel' input
-		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
+		echo "mutate ${mut#* }"
 	done < input.txt
 	echo "opt_dff" # workaround for verilator not supporting posedge 1'b1
-	echo "rename cv32e40p_decoder mutated"
+	echo "rename cv32e40p_alu_div mutated"
 	echo "write_verilog -attr2comment mutated.sv"
 } > mutate.ys
 
@@ -37,11 +38,9 @@ yosys -ql mutate.log mutate.ys
 source ../../../common/params.sh
 
 # create modified manifest
-ORIG_MANIFEST="$PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist"
-grep -v "cv32e40p_decoder.sv" $ORIG_MANIFEST > mutated_manifest.flist
-echo "../../cv32e40p_decoder_wrapper_dpi.sv" >> mutated_manifest.flist
-echo "mutated.sv" >> mutated_manifest.flist
+grep -v "cv32e40p_alu_div.sv" $PROJ_ROOT_DIR/core-v-cores/cv32e40p/cv32e40p_manifest.flist > mutated_manifest.flist
+echo "../../cv32e40p_alu_div_wrapper.sv" >> mutated_manifest.flist
+echo "$PWD/mutated.sv" >> mutated_manifest.flist
 
+source ../../../common/run_pulp.sh
 
-mutprobe='TOP.tb_top_verilator.cv32e40p_tb_wrapper_i.cv32e40p_core_i.id_stage_i.decoder_i'
-source ../../../common/run_sim.sh

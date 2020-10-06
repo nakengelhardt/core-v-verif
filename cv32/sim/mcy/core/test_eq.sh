@@ -9,8 +9,7 @@ set -ex
 		echo "mutate -ctrl mutsel 8 ${idx} ${mut#* }"
 	done < input.txt
 	echo "pmuxtree" # workaround for possible source of fmgap
-	#echo 'simplemap t:$or'
-	echo "opt -fine"
+	echo 'simplemap cv32e40p_ff_one/t:$or'
 	echo "write_verilog mutated.sv"
 } > mutate.ys
 
