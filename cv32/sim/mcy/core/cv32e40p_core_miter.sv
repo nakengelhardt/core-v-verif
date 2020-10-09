@@ -139,9 +139,7 @@ end
             assert ((ref_data_wdata_o == uut_data_wdata_o)) ;
             assert ((ref_apu_master_req_o == uut_apu_master_req_o)) ;
             assert ((ref_apu_master_ready_o == uut_apu_master_ready_o)) ;
-            assert ((ref_apu_master_operands_o[0] == uut_apu_master_operands_o[0])) ;
-            assert ((ref_apu_master_operands_o[1] == uut_apu_master_operands_o[1])) ;
-            assert ((ref_apu_master_operands_o[2] == uut_apu_master_operands_o[2])) ;
+            assert ((ref_apu_master_operands_o == uut_apu_master_operands_o)) ;
             assert ((ref_apu_master_op_o == uut_apu_master_op_o)) ;
             assert ((ref_apu_master_type_o == uut_apu_master_type_o)) ;
             assert ((ref_apu_master_flags_o == uut_apu_master_flags_o)) ;

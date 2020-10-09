@@ -4,6 +4,7 @@ tags COVERED UNCOVERED NOCHANGE PROBE FMGAP VERI UVM
 
 [setup]
 bash ../common/setup_dsim.sh
+bash ../common/setup_int.sh
 
 [script]
 script read_sources.ys

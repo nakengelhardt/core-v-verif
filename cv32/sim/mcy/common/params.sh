@@ -23,7 +23,7 @@ PROJ_ROOT_DIR=`realpath $PWD/../../../../../..`
 CUSTOM_PROGS="hello-world illegal fibonacci misalign dhrystone"
 CUSTOM_PROGS+=" riscv_ebreak_test_0 csr_instructions" # interrupt_test"
 COREV_PROGS=" riscv_arithmetic_basic_test_0 corev_arithmetic_base_test_0 corev_arithmetic_base_test_1 corev_rand_instr_test_0 corev_rand_instr_test_1 corev_jump_stress_test_0 corev_jump_stress_test_1"
-NUM_INTERRUPT_TESTS=10
+NUM_INTERRUPT_TESTS=100
 for i in $(seq 1 $NUM_INTERRUPT_TESTS) ; do
 COREV_PROGS+=" corev_rand_interrupt_${i}"
 COREV_DSIM_ONLY_PROGS+=" corev_rand_interrupt_wfi_${i}"
